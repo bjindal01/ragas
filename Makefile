@@ -6,6 +6,26 @@ Q := $(if $(V),,@)
 # Common paths
 RAGAS_PATHS := src tests docs
 
+# uv is the only tool needed before the first `make build`. If it is missing, the
+# uv-based install targets install it with the official installer into UV_INSTALL_DIR,
+# without editing shell profiles. Set UV_AUTO_INSTALL=0 to fail with instructions instead.
+UV_INSTALL_DIR ?= $(HOME)/.local/bin
+UV_INSTALLER_URL ?= https://astral.sh/uv/install.sh
+UV_AUTO_INSTALL ?= 1
+# Targets that work before uv is installed. Any other target fails fast with
+# instructions instead of "uv: No such file or directory" (Error 127).
+UV_FREE_GOALS := help all build ensure-uv install-minimal install setup-venv clean benchmarks-docker check-mermaid-deps
+ifeq ($(shell command -v uv 2>/dev/null),)
+# PATH is only touched when uv is not on it, and the directory is appended so the
+# separator stays right on Windows, where PATH uses ";".
+export PATH := $(PATH)$(if $(findstring ;,$(PATH)),;,:)$(UV_INSTALL_DIR)
+ifeq ($(wildcard $(UV_INSTALL_DIR)/uv $(UV_INSTALL_DIR)/uv.exe),)
+ifneq ($(filter-out $(UV_FREE_GOALS),$(MAKECMDGOALS)),)
+$(error uv is required but was not found. Run 'make build' to install it and set up the project, or install it yourself: curl -LsSf $(UV_INSTALLER_URL) | sh)
+endif
+endif
+endif
+
 help: ## Show all Makefile targets
 	$(Q)grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[33m%-30s\033[0m %s\n", $$1, $$2}'
 
@@ -13,26 +33,59 @@ help: ## Show all Makefile targets
 # SETUP & INSTALLATION
 # =============================================================================
 
+.PHONY: all build ensure-uv
+
+build: ## One command from a fresh clone: install uv if needed, install-minimal, run-ci, package-smoke
+	$(Q)$(MAKE) --no-print-directory install-minimal
+	$(Q)$(MAKE) --no-print-directory run-ci
+	$(Q)$(MAKE) --no-print-directory package-smoke
+	@echo "Build complete: environment installed, lint, type check and unit tests passed, package builds and imports."
+
+all: build ## Alias for build
+
+ensure-uv: ## Check for uv; install it to UV_INSTALL_DIR if missing (UV_AUTO_INSTALL=0 only checks)
+	$(Q)if command -v uv >/dev/null 2>&1; then \
+		echo "Using $$(uv --version) at $$(command -v uv)"; \
+	elif [ "$(UV_AUTO_INSTALL)" = "0" ]; then \
+		echo "error: uv is required but was not found on PATH." >&2; \
+		echo "Install it with: curl -LsSf $(UV_INSTALLER_URL) | sh" >&2; \
+		echo "Other methods: https://docs.astral.sh/uv/getting-started/installation/" >&2; \
+		exit 1; \
+	else \
+		echo "uv not found; installing it to $(UV_INSTALL_DIR) from $(UV_INSTALLER_URL)"; \
+		if command -v curl >/dev/null 2>&1; then \
+			curl -LsSf "$(UV_INSTALLER_URL)" | env UV_INSTALL_DIR="$(UV_INSTALL_DIR)" UV_NO_MODIFY_PATH=1 sh || exit 1; \
+		elif command -v wget >/dev/null 2>&1; then \
+			wget -qO- "$(UV_INSTALLER_URL)" | env UV_INSTALL_DIR="$(UV_INSTALL_DIR)" UV_NO_MODIFY_PATH=1 sh || exit 1; \
+		else \
+			echo "error: uv is missing and neither curl nor wget is available to install it." >&2; \
+			echo "Install uv manually: https://docs.astral.sh/uv/getting-started/installation/" >&2; \
+			exit 1; \
+		fi; \
+		command -v uv >/dev/null 2>&1 || { echo "error: uv was installed but is not runnable from $(UV_INSTALL_DIR)" >&2; exit 1; }; \
+		echo "Installed $$(uv --version). Make finds it; add $(UV_INSTALL_DIR) to PATH to run uv directly."; \
+	fi
+
 setup-venv: ## Set up uv virtual environment
 	@echo "Setting up uv virtual environment..."
 	$(Q)VIRTUAL_ENV= uv venv
 	@echo "Virtual environment created at .venv"
 	@echo "To activate: source .venv/bin/activate"
 
-install-minimal: ## Install minimal dev dependencies (fast setup - 79 packages)
+install-minimal: ensure-uv ## Install minimal dev dependencies from uv.lock (fast setup, no torch)
 	@echo "Installing minimal development dependencies (fast setup)..."
 	@if [ ! -d ".venv" ]; then \
 		echo "Virtual environment not found, creating one..."; \
 		$(MAKE) setup-venv; \
 	fi
-	@echo "Installing core ragas + essential dev tools..."
-	$(Q)uv pip install -e ".[dev-minimal]"
+	@echo "Installing core ragas + essential dev tools (locked versions from uv.lock)..."
+	$(Q)uv sync --active --extra dev-minimal --no-default-groups
 	@echo "Setting up pre-commit hooks..."
-	$(Q)uv run pre-commit install
-	@echo "Minimal installation complete! (79 packages)"
+	$(Q)uv run --active --no-sync pre-commit install
+	@echo "Minimal installation complete!"
 	@echo "Note: For full features including ML packages, use 'make install'"
 
-install: ## Install full dependencies with uv sync (backward compatible - modern approach)
+install: ensure-uv ## Install full dependencies with uv sync (backward compatible - modern approach)
 	@echo "Installing full development dependencies with uv sync..."
 	@if [ ! -d ".venv" ]; then \
 		echo "Virtual environment not found, creating one..."; \
@@ -120,7 +173,7 @@ run-ci-type: ## Run type checking (matches GitHub CI)
 
 run-ci-tests: ## Run all tests with CI options
 	@echo "Running all tests with CI options..."
-	$(Q)__RAGAS_DEBUG_TRACKING=true RAGAS_DO_NOT_TRACK=true pytest --nbmake tests/unit --dist loadfile -n auto
+	$(Q)__RAGAS_DEBUG_TRACKING=true RAGAS_DO_NOT_TRACK=true uv run --active pytest --nbmake tests/unit --dist loadfile -n auto
 
 run-ci-fast: ## Fast CI check for quick local validation (2-3 minutes)
 	@echo "Running fast CI check for quick feedback..."

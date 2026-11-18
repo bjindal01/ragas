@@ -176,7 +176,6 @@ experimental/ragas_experimental/_version.py
 examples/ragas_examples/_version.py
 .vscode
 .envrc
-uv.lock
 .cache/
 .claude/*
 !.claude/commands/

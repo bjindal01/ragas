@@ -7,23 +7,26 @@ This comprehensive guide covers development workflows for the Ragas monorepo, de
 ```bash
 # 1. Clone and enter the repository
 git clone https://github.com/vibrantlabsai/ragas.git
+cd ragas
 
-# 2. Install uv (if not already installed)
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# 2. Set up and verify everything with one command:
+#    installs uv if missing, then install-minimal, run-ci and package-smoke
+make build
 
-# 3. Choose your installation type:
+# 3. Start developing!
+make help  # See all available commands
+```
 
-# RECOMMENDED: Minimal dev setup (fast)
+`make build` needs only `make`, `git` and `curl` (or `wget`). If `uv` is not on your `PATH`, it is installed with the official installer to `~/.local/bin` (override with `UV_INSTALL_DIR=...`) without editing your shell profile. To be told instead of having uv installed for you, run `make build UV_AUTO_INSTALL=0`. uv provides Python too, so no particular system Python is required. `make type` downloads the latest pyright, so the build needs network access.
+
+To install without running the checks, pick an installation type:
+
+```bash
+# RECOMMENDED: Minimal dev setup (~190 packages, ~1 GB, no torch; runs the whole unit suite)
 make install-minimal
 
-# FULL: Complete dev environment (comprehensive)
+# FULL: Complete dev environment (~360 packages, ~7 GB incl. torch/CUDA)
 make install
-
-# 4. Verify everything works
-make check
-
-# 5. Start developing!
-make help  # See all available commands
 ```
 
 ## Quick Start (for AI Agents)
@@ -33,6 +36,7 @@ AI agents working with this codebase should use these standardized commands:
 ```bash
 # Essential commands for AI development
 make help           # See all available targets
+make build          # Fresh clone to verified build (installs uv if missing)
 make install-minimal # Minimal dev setup (fast)
 make install        # Full environment (modern uv sync)
 make check          # Quick health check (format + type)
@@ -104,12 +108,14 @@ make install
 # Install uv if not available
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Minimal dev: Core + essential dev tools
-uv pip install -e ".[dev-minimal]"
+# Minimal dev: Core + essential dev tools and light test dependencies
+uv sync --extra dev-minimal
 
 # Full dev: Everything (uses modern uv sync)
 uv sync --group dev
 ```
+
+No dependency group is installed unless you ask for it (`[tool.uv] default-groups = []`), so `uv run` never pulls the heavy `dev` group into a minimal environment.
 
 #### Which Option to Choose?
 
@@ -127,8 +133,12 @@ uv sync --group dev
 
 #### Installation Methods Explained
 
-- **`install-minimal`**: Uses `uv pip install -e ".[dev-minimal]"` for selective minimal dev dependencies
+- **`install-minimal`**: Uses `uv sync --extra dev-minimal` for selective minimal dev dependencies
 - **`install`**: Uses `uv sync --group dev` for complete modern dependency management
+
+#### Locked dependencies (`uv.lock`)
+
+`uv.lock` is committed, so every install resolves the same versions on every machine. When you add, remove or change a dependency in `pyproject.toml`, run `uv lock` and commit the updated `uv.lock` with your change. CI fails on a stale lockfile (`uv lock --check`). To move locked versions forward, run `uv lock --upgrade` (or `uv lock --upgrade-package <name>`).
 
 ### Verification
 ```bash
@@ -141,6 +151,8 @@ make test   # Runs all tests
 Run `make help` to see all targets. Here are the essential commands:
 
 ### Setup & Installation
+- `make build` - One command from a fresh clone: install uv if missing, install-minimal, run-ci, package-smoke (alias: `make all`)
+- `make ensure-uv` - Check for uv and install it if missing (`UV_AUTO_INSTALL=0` only checks)
 - `make install-minimal` - Install minimal dev setup (recommended)
 - `make install` - Install full environment with uv sync (complete)
 
@@ -249,7 +261,7 @@ make type  # Type check all code with pyright
 Our GitHub Actions CI runs:
 1. **Dependency Installation**: Using uv for consistent environments
 2. **Code Quality Checks**: Format and type validation
-3. **Testing**: Unit and integration tests across Python 3.9-3.12
+3. **Testing**: Unit tests across Python 3.9-3.13
 4. **Multi-OS Testing**: Ubuntu, macOS, Windows
 
 ### Local CI Simulation
@@ -313,7 +325,9 @@ make test    # Must pass
 
 #### uv Not Found
 ```bash
-# Install uv
+# Let make install it to ~/.local/bin (or run make build, which does this first)
+make ensure-uv
+# or install it yourself
 curl -LsSf https://astral.sh/uv/install.sh | sh
 # or use pip: pip install uv
 ```
@@ -391,7 +405,7 @@ uv run ruff check --no-fix    # Check issues without fixing
 #### Python 3.13 on macOS ARM: NumPy fails to install (builds from source)
 
 - Symptom: `make install` attempts to build `numpy==2.0.x` from source on Python 3.13 (no prebuilt wheel), failing with C/C++ errors.
-- Status: Ragas CI supports Python 3.9–3.12. Python 3.13 is not officially supported yet.
+- Status: Ragas CI tests Python 3.9 to 3.13. Installs from the committed `uv.lock` (`make install`, `make install-minimal`) get a NumPy release with Python 3.13 wheels, so this only affects installs that resolve dependencies on their own (for example `pip install` or a stale lockfile).
 
 Workarounds:
 1) Recommended: use Python 3.12
