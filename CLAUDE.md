@@ -19,10 +19,14 @@ The repository contains:
 Choose the appropriate installation based on your needs:
 
 ```bash
-# RECOMMENDED: Minimal dev setup (79 packages - fast)
+# ONE COMMAND from a fresh clone: installs uv if missing, then install-minimal,
+# run-ci (format, lint, type check, unit tests) and package-smoke
+make build
+
+# RECOMMENDED: Minimal dev setup (~190 packages, ~1 GB, no torch - fast)
 make install-minimal
 
-# FULL: Complete dev environment (383 packages - comprehensive)  
+# FULL: Complete dev environment (~360 packages, ~7 GB incl. torch/CUDA)
 make install
 
 # OR manual installation:
@@ -30,8 +34,8 @@ make install
 python -m venv venv
 source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 
-# Minimal dev setup (uses [project.optional-dependencies].dev-minimal)
-uv pip install -e ".[dev-minimal]"
+# Minimal dev setup (uses [project.optional-dependencies].dev-minimal, locked in uv.lock)
+uv sync --extra dev-minimal
 
 # Full dev setup (uses [dependency-groups].dev)
 uv sync --group dev
@@ -39,7 +43,7 @@ uv sync --group dev
 
 ### Installation Methods Explained
 
-- **Minimal setup**: Uses `uv pip install` with optional dependencies for selective installation
+- **Minimal setup**: Uses `uv sync --extra dev-minimal` (locked versions from the committed `uv.lock`)
 - **Full setup**: Uses `uv sync` with dependency groups for comprehensive environment management
 - **No naming conflicts**: `dev-minimal` vs `dev` clearly distinguish the two approaches
 
@@ -48,7 +52,7 @@ uv sync --group dev
 The project uses a UV workspace configuration for managing multiple packages:
 
 ```bash
-# Install
+# Install ragas only (no dependency group is installed by default; add --group dev for the full stack)
 uv sync
 
 # Install examples separately
@@ -69,9 +73,10 @@ The workspace ensures consistent dependency versions across packages and enables
 ### Commands (from root directory)
 
 ```bash
-# Setup and installation  
-make install-minimal # Minimal dev setup (79 packages - recommended)
-make install        # Full dev environment (383 packages - complete)
+# Setup and installation
+make build          # Fresh clone to verified build (installs uv if missing)
+make install-minimal # Minimal dev setup (~190 packages, no torch - recommended)
+make install        # Full dev environment (~360 packages - complete)
 
 # Code quality
 make format         # Format and lint all code
@@ -212,7 +217,8 @@ analytics_logger.addHandler(console_handler)
 - whenever you create such docs put in in /\_experiments because that is gitignored and you can use it as a scratchpad or tmp directory for storing these
 - always use uv to run python and python related commandline tools like isort, ruff, pyright etc. This is because we are using uv to manage the .venv and dependencies.
 - The project uses two distinct dependency management approaches:
-  - **Minimal setup**: `[project.optional-dependencies].dev-minimal` for fast development (79 packages)
-  - **Full setup**: `[dependency-groups].dev` for comprehensive development (383 packages)
+  - **Minimal setup**: `[project.optional-dependencies].dev-minimal` for fast development (~190 packages)
+  - **Full setup**: `[dependency-groups].dev` for comprehensive development (~360 packages)
+- `uv.lock` is committed. After changing dependencies in `pyproject.toml`, run `uv lock` and commit the updated `uv.lock` (CI runs `uv lock --check`).
 - Use `make install-minimal` for most development tasks, `make install` for full ML stack work
 - if the user asks you to save a plan, save it into the plan/ directory with an appropriate file name.
