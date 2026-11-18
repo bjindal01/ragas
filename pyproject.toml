@@ -66,7 +66,9 @@ oci = ["oci>=2.160.1"]
 ag-ui = ["ag-ui-protocol>=0.1.9", "httpx>=0.27.0"]
 dspy = ["dspy-ai>=2.4.0"]
 
-# Minimal dev dependencies for fast development setup (used by make install-minimal)
+# Minimal dev dependencies for fast development setup (used by make install-minimal).
+# Besides the tools, this holds the light optional packages the unit tests import, so
+# the whole unit suite runs without the heavy ML stack (torch, transformers) in `dev`.
 dev-minimal = [
     "ruff>=0.16,<0.17",  # one minor series: the formatter changes output between minors
     "pyright>=1.1.403",
@@ -74,6 +76,14 @@ dev-minimal = [
     "pytest",
     "pytest-xdist[psutil]",
     "pytest-asyncio",
+    # Optional packages imported by unit tests
+    "ragas[git,gdrive]",
+    "rapidfuzz",
+    "sacrebleu",
+    "llama-index-core",
+    # These releases evaluate `X | None` at runtime, which fails on Python 3.9
+    "banks<2.4.4; python_version < '3.10'",
+    "llama-index-core<0.14.15; python_version < '3.10'",
     "nbmake",
     "build>=1.3.0",
 ]
@@ -139,6 +149,12 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 # Path to version file relative to this pyproject.toml
 version_file = "src/ragas/_version.py"
+
+[tool.uv]
+# `uv run` and `uv sync` install no dependency group unless asked. Otherwise every
+# `uv run` would pull the full `dev` group (torch, CUDA, about 7 GB) into a
+# `make install-minimal` environment. `make install` asks for `--group dev` explicitly.
+default-groups = []
 
 # UV Workspace Configuration
 [tool.uv.workspace]

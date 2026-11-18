@@ -19,17 +19,17 @@ setup-venv: ## Set up uv virtual environment
 	@echo "Virtual environment created at .venv"
 	@echo "To activate: source .venv/bin/activate"
 
-install-minimal: ## Install minimal dev dependencies (fast setup - 79 packages)
+install-minimal: ## Install minimal dev dependencies from uv.lock (fast setup, no torch)
 	@echo "Installing minimal development dependencies (fast setup)..."
 	@if [ ! -d ".venv" ]; then \
 		echo "Virtual environment not found, creating one..."; \
 		$(MAKE) setup-venv; \
 	fi
-	@echo "Installing core ragas + essential dev tools..."
-	$(Q)uv pip install -e ".[dev-minimal]"
+	@echo "Installing core ragas + essential dev tools (locked versions from uv.lock)..."
+	$(Q)uv sync --active --extra dev-minimal --no-default-groups
 	@echo "Setting up pre-commit hooks..."
-	$(Q)uv run pre-commit install
-	@echo "Minimal installation complete! (79 packages)"
+	$(Q)uv run --active --no-sync pre-commit install
+	@echo "Minimal installation complete!"
 	@echo "Note: For full features including ML packages, use 'make install'"
 
 install: ## Install full dependencies with uv sync (backward compatible - modern approach)
@@ -113,7 +113,7 @@ run-ci-type: ## Run type checking (matches GitHub CI)
 
 run-ci-tests: ## Run all tests with CI options
 	@echo "Running all tests with CI options..."
-	$(Q)__RAGAS_DEBUG_TRACKING=true RAGAS_DO_NOT_TRACK=true pytest --nbmake tests/unit --dist loadfile -n auto
+	$(Q)__RAGAS_DEBUG_TRACKING=true RAGAS_DO_NOT_TRACK=true uv run --active pytest --nbmake tests/unit --dist loadfile -n auto
 
 run-ci-fast: ## Fast CI check for quick local validation (2-3 minutes)
 	@echo "Running fast CI check for quick feedback..."
