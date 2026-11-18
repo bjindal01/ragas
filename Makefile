@@ -48,7 +48,7 @@ install: ## Install full dependencies with uv sync (backward compatible - modern
 # CODE QUALITY
 # =============================================================================
 
-.PHONY: help setup-venv install-minimal install format type check clean test test-e2e benchmarks benchmarks-docker run-ci run-ci-fast run-ci-format-check run-ci-type run-ci-tests package-smoke build-docs serve-docs
+.PHONY: help setup-venv install-minimal install format type check clean test test-cov test-e2e benchmarks benchmarks-docker run-ci run-ci-fast run-ci-format-check run-ci-type run-ci-tests package-smoke build-docs serve-docs
 format: ## Format and lint all code
 	@echo "Formatting and linting all code..."
 	@echo "(ruff format) Formatting ragas..."
@@ -98,7 +98,7 @@ run-ci: ## Run complete CI pipeline (mirrors GitHub CI exactly)
 	@echo "Type check..."
 	$(Q)$(MAKE) type
 	@echo "Unit tests..."
-	$(Q)__RAGAS_DEBUG_TRACKING=true RAGAS_DO_NOT_TRACK=true uv run --active pytest --nbmake tests/unit --dist loadfile -n auto
+	$(Q)__RAGAS_DEBUG_TRACKING=true RAGAS_DO_NOT_TRACK=true uv run --active pytest --nbmake tests/unit --dist loadfile -n auto --cov --cov-report=term-missing:skip-covered
 	@echo "All CI checks passed!"
 
 run-ci-format-check: ## Run format check in dry-run mode (like GitHub CI)
@@ -156,6 +156,10 @@ clean: ## Clean all generated files
 test: ## Run all unit tests
 	@echo "Running all unit tests..."
 	$(Q)uv run --active pytest tests/unit $(shell if [ -n "$(k)" ]; then echo "-k $(k)"; fi)
+
+test-cov: ## Run unit tests with coverage; fails if coverage drops below fail_under in pyproject.toml
+	@echo "Running unit tests with coverage..."
+	$(Q)__RAGAS_DEBUG_TRACKING=true RAGAS_DO_NOT_TRACK=true uv run --active pytest tests/unit --dist loadfile -n auto --cov --cov-report=term-missing:skip-covered --cov-report=xml $(shell if [ -n "$(k)" ]; then echo "-k $(k)"; fi)
 
 test-all: ## Run all unit tests (including notebooks)
 	@echo "Running all unit tests (including notebooks)..."

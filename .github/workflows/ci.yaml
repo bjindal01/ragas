@@ -35,7 +35,6 @@ jobs:
           filters: |
             related: &related
               - .github/workflows/ci.yaml
-              - codecov.yml
               - pyproject.toml
               - Makefile
             ragas:
@@ -123,6 +122,12 @@ jobs:
           if [ "${{ matrix.os }}" != 'windows-latest' ]; then
             # Use pytest-xdist to improve test run-time on Linux/macOS
             OPTS=(--dist loadfile -n auto)
+          fi
+
+          # Coverage is measured and enforced (fail_under in pyproject.toml) on one
+          # reference job, since optional dependencies and skips differ per Python/OS.
+          if [ "${{ matrix.os }}" = 'ubuntu-latest' ] && [ "${{ matrix.python-version }}" = '3.12' ]; then
+            OPTS+=(--cov --cov-report=term-missing:skip-covered)
           fi
 
           # Run different test suites based on test type
