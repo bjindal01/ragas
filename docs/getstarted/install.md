@@ -19,6 +19,13 @@ git clone https://github.com/vibrantlabsai/ragas.git
 pip install -e .
 ```
 
+To set up the full contributor environment (dev tools, locked dependency versions from `uv.lock`) and verify it with lint, type checks, unit tests and a package build, run one command from the clone. It installs [uv](https://docs.astral.sh/uv/) first if it is missing:
+
+```bash
+cd ragas
+make build
+```
+
 !!! note on "LangChain OpenAI dependency versions"
     If you use `langchain_openai` (e.g., `ChatOpenAI`), install `langchain-core` and `langchain-openai` explicitly to avoid version mismatches. You can adjust bounds to match your environment, but installing both explicitly helps prevent strict dependency conflicts.
     ```bash

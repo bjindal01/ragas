@@ -71,7 +71,7 @@ class ToolCallAccuracy(MultiTurnMetric):
             return 0.0
 
         score = 0.0
-        for arg in refs.keys():
+        for arg in refs:
             if arg in preds:
                 score += await self.arg_comparison_metric.single_turn_ascore(
                     SingleTurnSample(
@@ -126,11 +126,13 @@ class ToolCallAccuracy(MultiTurnMetric):
             # Both empty - perfect match
             return 1.0
         elif not pred_tool_calls:
-            warnings.warn("No tool calls found in the user input")
+            warnings.warn("No tool calls found in the user input", stacklevel=2)
             return 0.0
         elif not reference_tool_calls:
             # Reference is empty but we have predictions - this is typically an error in test data
-            warnings.warn("Reference tool calls are empty but predictions exist")
+            warnings.warn(
+                "Reference tool calls are empty but predictions exist", stacklevel=2
+            )
             return 0.0
 
         # Sort tool calls if not using strict order
@@ -148,7 +150,8 @@ class ToolCallAccuracy(MultiTurnMetric):
                 f"Length mismatch: predicted tool calls ({len(pred_tool_calls)}) "
                 f"vs reference tool calls ({len(reference_tool_calls)}). "
                 f"Only the first {min(len(pred_tool_calls), len(reference_tool_calls))} "
-                f"tool calls will be compared."
+                f"tool calls will be compared.",
+                stacklevel=2,
             )
 
         tool_call_pred_sequence = [tool_call.name for tool_call in pred_tool_calls]

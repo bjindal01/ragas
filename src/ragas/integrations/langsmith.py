@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import typing as t
 
-from langchain.smith import RunEvalConfig
+# langchain 1.x moved these to langchain-classic, so this module only imports
+# with langchain<1.
+from langchain.smith import RunEvalConfig  # pyright: ignore[reportMissingImports]
 
 from ragas.integrations.langchain import EvaluatorChain
 
@@ -14,10 +16,10 @@ if t.TYPE_CHECKING:
 try:
     from langsmith import Client
     from langsmith.utils import LangSmithNotFoundError
-except ImportError:
+except ImportError as e:
     raise ImportError(
         "Please install langsmith to use this feature. You can install it via pip install langsmith"
-    )
+    ) from e
 
 
 def upload_dataset(
@@ -148,10 +150,10 @@ def evaluate(
     client = Client()
     try:
         _ = client.read_dataset(dataset_name=dataset_name)
-    except LangSmithNotFoundError:
+    except LangSmithNotFoundError as e:
         raise ValueError(
             f"Dataset {dataset_name} not found in langsmith, make sure it exists in langsmith"
-        )
+        ) from e
 
     # make config
     if metrics is None:

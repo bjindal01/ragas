@@ -19,12 +19,10 @@ class BaseTokenizer(ABC):
     @abstractmethod
     def encode(self, text: str) -> t.List[int]:
         """Encode text into token IDs."""
-        pass
 
     @abstractmethod
     def decode(self, tokens: t.List[int]) -> str:
         """Decode token IDs back into text."""
-        pass
 
     def count_tokens(self, text: str) -> int:
         """Count the number of tokens in text."""
@@ -99,12 +97,14 @@ class HuggingFaceTokenizer(BaseTokenizer):
             self._tokenizer = tokenizer
         elif model_name is not None:
             try:
-                from transformers import AutoTokenizer
-            except ImportError:
+                from transformers import (  # pyright: ignore[reportMissingImports]
+                    AutoTokenizer,
+                )
+            except ImportError as e:
                 raise ImportError(
                     "transformers package is required for HuggingFace tokenizers. "
                     "Install it with: pip install transformers"
-                )
+                ) from e
             self._tokenizer = AutoTokenizer.from_pretrained(model_name)
         else:
             raise ValueError("Either tokenizer or model_name must be provided")

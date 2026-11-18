@@ -25,12 +25,10 @@ class SimpleExampleStore(ABC):
         self, data: t.Dict, top_k: int = 5
     ) -> t.List[t.Tuple[t.Dict, t.Dict]]:
         """Get top_k most similar examples to data."""
-        pass
 
     @abstractmethod
     def add_example(self, input: t.Dict, output: t.Dict) -> None:
         """Add an example to the store."""
-        pass
 
 
 class SimpleInMemoryExampleStore(SimpleExampleStore):
@@ -284,14 +282,16 @@ class DynamicFewShotPrompt(Prompt):
             warnings.warn(
                 "response_model cannot be saved and will be lost. "
                 "You'll need to set it manually after loading using: "
-                "DynamicFewShotPrompt.load(path, response_model=YourModel)"
+                "DynamicFewShotPrompt.load(path, response_model=YourModel)",
+                stacklevel=2,
             )
 
         if self.example_store.embedding_model:
             warnings.warn(
                 "embedding_model cannot be saved and will be lost. "
                 "You'll need to set it manually after loading using: "
-                "DynamicFewShotPrompt.load(path, embedding_model=YourModel)"
+                "DynamicFewShotPrompt.load(path, embedding_model=YourModel)",
+                stacklevel=2,
             )
 
         data = {
@@ -321,7 +321,7 @@ class DynamicFewShotPrompt(Prompt):
                 with open(file_path, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=2)
         except (OSError, IOError) as e:
-            raise ValueError(f"Cannot save DynamicFewShotPrompt to {path}: {e}")
+            raise ValueError(f"Cannot save DynamicFewShotPrompt to {path}: {e}") from e
 
     def _serialize_embedding_model_info(self) -> t.Optional[t.Dict]:
         """Serialize embedding model information for storage."""
@@ -376,7 +376,9 @@ class DynamicFewShotPrompt(Prompt):
                 with open(file_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError, OSError) as e:
-            raise ValueError(f"Cannot load DynamicFewShotPrompt from {path}: {e}")
+            raise ValueError(
+                f"Cannot load DynamicFewShotPrompt from {path}: {e}"
+            ) from e
 
         # Validate format
         if data.get("type") != "DynamicFewShotPrompt":
@@ -397,7 +399,8 @@ class DynamicFewShotPrompt(Prompt):
             warnings.warn(
                 f"This prompt was created with an embedding_model of type '{embedding_model_info['class_name']}'. "
                 f"Without it, similarity-based example selection will not work. "
-                f"Consider: DynamicFewShotPrompt.load('{path}', embedding_model=YourModel)"
+                f"Consider: DynamicFewShotPrompt.load('{path}', embedding_model=YourModel)",
+                stacklevel=2,
             )
 
         # Extract examples

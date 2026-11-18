@@ -18,7 +18,7 @@ def test_debug_base_module():
     print(f"base_module has BaseRagasEmbedding: {has_class}")
 
     if has_class:
-        cls = getattr(base_module, "BaseRagasEmbedding")
+        cls = base_module.BaseRagasEmbedding
         print(f"BaseRagasEmbedding type: {type(cls)}")
         assert cls is not None
     else:
@@ -43,7 +43,7 @@ def test_direct_import_from_base():
         print(f"Module imported successfully: {ragas.embeddings.base}")
         # Now try to get the class
         if hasattr(ragas.embeddings.base, "BaseRagasEmbedding"):
-            cls = getattr(ragas.embeddings.base, "BaseRagasEmbedding")
+            cls = ragas.embeddings.base.BaseRagasEmbedding
             print(f"Found class via getattr: {cls}")
         else:
             print("Class not found via getattr either")

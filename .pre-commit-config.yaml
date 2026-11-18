@@ -1,6 +1,25 @@
 # Pre-commit configuration for entire ragas monorepo
 # Install with: make install && pre-commit install
+# `make lint` runs every hook below on the whole tree, plus ruff and pyright.
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+        # uv.lock is a generated, committed lockfile (~3.7 MB). It shows up as an
+        # added file whenever main is merged into an older branch, which would
+        # block that merge commit.
+        exclude: ^uv\.lock$
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+        # mkdocs*.yml use !!python/name tags, which need the unsafe loader
+        args: [--unsafe]
+      - id: debug-statements
+      - id: detect-private-key
   - repo: local
     hooks:
       - id: monorepo-ci

@@ -28,7 +28,8 @@ class FaithfulnessInput(BaseModel):
             "inputs:",
             self.response,
             "retrieved_contexts: ",
-        ] + self.retrieved_contexts
+            *self.retrieved_contexts,
+        ]
 
 
 class FaithfulnessOutput(BaseModel):

@@ -32,7 +32,8 @@ def _process_search_results(search_results: t.Dict[str, t.List]) -> t.List[str]:
     for key in ["graph_search_results", "context_document_results"]:
         if search_results.get(key) and len(search_results[key]) > 0:
             warnings.warn(
-                f"{key} are not included in the aggregated `retrieved_context` for Ragas evaluations."
+                f"{key} are not included in the aggregated `retrieved_context` for Ragas evaluations.",
+                stacklevel=2,
             )
 
     for result in search_results.get("chunk_search_results", []):

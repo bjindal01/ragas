@@ -8,12 +8,22 @@ import typing as t
 from pydantic import BaseModel
 
 try:
-    from google.auth.transport.requests import Request
-    from google.oauth2.credentials import Credentials as UserCredentials
-    from google.oauth2.service_account import Credentials
-    from google_auth_oauthlib.flow import InstalledAppFlow
-    from googleapiclient.discovery import build
-    from googleapiclient.errors import HttpError
+    from google.auth.transport.requests import (  # pyright: ignore[reportMissingImports]
+        Request,
+    )
+    from google.oauth2.credentials import (  # pyright: ignore[reportMissingImports]
+        Credentials as UserCredentials,
+    )
+    from google.oauth2.service_account import (  # pyright: ignore[reportMissingImports]
+        Credentials,
+    )
+    from google_auth_oauthlib.flow import (  # pyright: ignore[reportMissingImports]
+        InstalledAppFlow,
+    )
+    from googleapiclient.discovery import build  # pyright: ignore[reportMissingImports]
+    from googleapiclient.errors import (  # pyright: ignore[reportMissingImports]
+        HttpError,
+    )
 
     GDRIVE_AVAILABLE = True
 except ImportError:
@@ -164,11 +174,11 @@ class GDriveBackend(BaseBackend):
             if e.resp.status == 404:  # type: ignore
                 raise ValueError(
                     f"Folder with ID {self.folder_id} not found or not accessible"
-                )
+                ) from e
             else:
                 raise ValueError(
                     f"Failed to access folder with ID {self.folder_id}: {e}"
-                )
+                ) from e
 
         # Create datasets and experiments folders if they don't exist
         self.datasets_folder_id = self._get_or_create_folder("datasets", self.folder_id)
@@ -333,7 +343,7 @@ class GDriveBackend(BaseBackend):
         all_keys = set()
         for item in data:
             all_keys.update(item.keys())
-        headers = sorted(list(all_keys))
+        headers = sorted(all_keys)
 
         # Prepare data for the sheet
         sheet_data = [headers]  # First row is headers

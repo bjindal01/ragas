@@ -67,12 +67,12 @@ class CHRFScore(BaseMetric):
             MetricResult with CHRF score (0.0-1.0)
         """
         try:
-            from sacrebleu import corpus_chrf
-        except ImportError:
+            from sacrebleu import corpus_chrf  # pyright: ignore[reportMissingImports]
+        except ImportError as e:
             raise ImportError(
                 "sacrebleu is required for CHRF score calculation. "
                 "Please install it using `pip install sacrebleu`"
-            )
+            ) from e
 
         if not isinstance(reference, str) or not isinstance(response, str):
             return MetricResult(

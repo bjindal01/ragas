@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import warnings
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -171,14 +172,12 @@ class TestNestAsyncioNotAppliedInAevaluate:
 
                                     from ragas import aevaluate
 
-                                    try:
+                                    with contextlib.suppress(Exception):
                                         await aevaluate(
                                             dataset=mock_dataset_instance,
                                             metrics=[],
                                             show_progress=False,
                                         )
-                                    except Exception:
-                                        pass
 
             # aevaluate should never call apply_nest_asyncio
             mock_apply.assert_not_called()

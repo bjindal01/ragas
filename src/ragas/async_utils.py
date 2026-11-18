@@ -31,10 +31,10 @@ def apply_nest_asyncio() -> bool:
 
     try:
         import nest_asyncio
-    except ImportError:
+    except ImportError as exc:
         raise ImportError(
             "It seems like your running this in a jupyter-like environment. Please install nest_asyncio with `pip install nest_asyncio` to make it work."
-        )
+        ) from exc
 
     try:
         loop = asyncio.get_running_loop()

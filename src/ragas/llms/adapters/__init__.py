@@ -45,10 +45,7 @@ def _is_new_google_genai_client(client: t.Any) -> bool:
         return True
 
     # Check class name as fallback (new SDK uses Client with models attribute)
-    if client_class == "Client" and hasattr(client, "models"):
-        return True
-
-    return False
+    return bool(client_class == "Client" and hasattr(client, "models"))
 
 
 def auto_detect_adapter(client: t.Any, provider: str) -> str:
@@ -69,9 +66,8 @@ def auto_detect_adapter(client: t.Any, provider: str) -> str:
         Adapter name ("instructor" or "litellm")
     """
     # Check if client is LiteLLM
-    if hasattr(client, "__class__"):
-        if "litellm" in client.__class__.__module__:
-            return "litellm"
+    if hasattr(client, "__class__") and "litellm" in client.__class__.__module__:
+        return "litellm"
 
     # Check provider for Google/Gemini
     if provider.lower() in ("google", "gemini"):

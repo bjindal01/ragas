@@ -21,7 +21,7 @@ except Exception:  # pragma: no cover - absence is okay
     _oci = None  # type: ignore
 
 try:  # pragma: no cover - environment dependent
-    from oci.generative_ai import (
+    from oci.generative_ai import (  # pyright: ignore[reportMissingImports]
         GenerativeAiClient as _GenerativeAiClient,  # type: ignore
     )
 except Exception:  # pragma: no cover
@@ -138,10 +138,10 @@ class OCIGenAIWrapper(BaseRagasLLM):
 
         # If prompt can be converted to string
         if hasattr(prompt, "to_string"):
-            return oci_messages + [{"role": "user", "content": prompt.to_string()}]
+            return [*oci_messages, {"role": "user", "content": prompt.to_string()}]
 
         # Generic fallback
-        return oci_messages + [{"role": "user", "content": str(prompt)}]
+        return [*oci_messages, {"role": "user", "content": str(prompt)}]
 
     def _create_generation_request(
         self,
@@ -261,7 +261,8 @@ class OCIGenAIWrapper(BaseRagasLLM):
                 )
 
                 response = await loop.run_in_executor(
-                    None, lambda: self._get_client().generate_text(**request)
+                    None,
+                    lambda request=request: self._get_client().generate_text(**request),
                 )
 
                 # Extract text from response

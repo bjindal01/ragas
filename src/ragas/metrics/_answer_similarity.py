@@ -53,7 +53,7 @@ class SemanticSimilarity(MetricWithEmbeddings, SingleTurnMetric):
     def __post_init__(self):
         # only for cross encoder
         if isinstance(self.embeddings, HuggingfaceEmbeddings):
-            self.is_cross_encoder = True if self.embeddings.is_cross_encoder else False
+            self.is_cross_encoder = bool(self.embeddings.is_cross_encoder)
             self.embeddings.encode_kwargs = {
                 **self.embeddings.encode_kwargs,
             }

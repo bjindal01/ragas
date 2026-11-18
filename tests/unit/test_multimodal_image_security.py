@@ -78,8 +78,8 @@ def net(monkeypatch):
             else:
                 try:
                     ipaddress.ip_address(host)
-                except ValueError:
-                    raise socket.gaierror(socket.EAI_NONAME, "no DNS in tests")
+                except ValueError as e:
+                    raise socket.gaierror(socket.EAI_NONAME, "no DNS in tests") from e
         return real_getaddrinfo(host, *args, **kwargs)
 
     def loopback_only_connect(self, address):

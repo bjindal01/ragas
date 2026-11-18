@@ -283,8 +283,8 @@ class IDBasedContextPrecision(SingleTurnMetric):
         assert reference_context_ids is not None, "reference_context_ids is empty"
 
         # Convert all IDs to strings to ensure consistent comparison
-        retrieved_ids_set = set(str(id) for id in retrieved_context_ids)
-        reference_ids_set = set(str(id) for id in reference_context_ids)
+        retrieved_ids_set = {str(id) for id in retrieved_context_ids}
+        reference_ids_set = {str(id) for id in reference_context_ids}
 
         # Calculate precision score
         total_retrieved = len(retrieved_ids_set)

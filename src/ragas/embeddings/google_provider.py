@@ -108,9 +108,7 @@ class GoogleEmbeddings(BaseRagasEmbedding):
             return self._import_genai_module()
 
         # Check if client has embed_content method (it's the old genai module)
-        if hasattr(client, "embed_content") and callable(
-            getattr(client, "embed_content")
-        ):
+        if hasattr(client, "embed_content") and callable(client.embed_content):
             self._use_new_sdk = False
             return client
 
@@ -152,16 +150,17 @@ class GoogleEmbeddings(BaseRagasEmbedding):
         client_class = client.__class__.__name__
 
         # New SDK: google.genai.client.Client
-        if "google.genai" in client_module and "generativeai" not in client_module:
-            # Verify it has the models.embed_content interface
-            if hasattr(client, "models") and hasattr(client.models, "embed_content"):
-                return True
-
-        # Check class name as fallback
-        if client_class == "Client" and hasattr(client, "models"):
+        # Verify it has the models.embed_content interface
+        if (
+            "google.genai" in client_module
+            and "generativeai" not in client_module
+            and hasattr(client, "models")
+            and hasattr(client.models, "embed_content")
+        ):
             return True
 
-        return False
+        # Check class name as fallback
+        return bool(client_class == "Client" and hasattr(client, "models"))
 
     def _import_genai_module(self) -> t.Any:
         """Import and return the Google genai module.
@@ -214,11 +213,11 @@ class GoogleEmbeddings(BaseRagasEmbedding):
         """Embed text using Vertex AI."""
         try:
             from vertexai.language_models import TextEmbeddingModel  # type: ignore
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "Vertex AI support requires google-cloud-aiplatform. "
                 "Install with: pip install google-cloud-aiplatform"
-            )
+            ) from e
 
         model = TextEmbeddingModel.from_pretrained(self.model)
         merged_kwargs = {**self.kwargs, **kwargs}
@@ -270,11 +269,11 @@ class GoogleEmbeddings(BaseRagasEmbedding):
         """Embed multiple texts using Vertex AI batch processing."""
         try:
             from vertexai.language_models import TextEmbeddingModel  # type: ignore
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "Vertex AI support requires google-cloud-aiplatform. "
                 "Install with: pip install google-cloud-aiplatform"
-            )
+            ) from e
 
         model = TextEmbeddingModel.from_pretrained(self.model)
         merged_kwargs = {**self.kwargs, **kwargs}

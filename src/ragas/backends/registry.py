@@ -90,8 +90,8 @@ class BackendRegistry:
         if not self._discovered:
             self.discover_backends()
         return {
-            primary_name: [primary_name] + self._get_aliases_for(primary_name)
-            for primary_name in self._backends.keys()
+            primary_name: [primary_name, *self._get_aliases_for(primary_name)]
+            for primary_name in self._backends
         }
 
     def discover_backends(self) -> t.Dict[str, t.Type[BaseBackend]]:
@@ -264,7 +264,7 @@ class BackendRegistry:
         return self._backends.items()
 
     def __repr__(self) -> str:
-        items = {name: backend_class for name, backend_class in self.items()}
+        items = dict(self.items())
         return repr(items)
 
     __str__ = __repr__

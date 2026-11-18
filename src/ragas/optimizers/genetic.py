@@ -204,7 +204,7 @@ class GeneticOptimizer(Optimizer):
                 seed_prompts = {
                     key: val.instruction
                     for key, val in self.metric.get_prompts().items()
-                    if key in initial_population[0].keys()
+                    if key in initial_population[0]
                 }
                 initial_population.append(seed_prompts)
 
@@ -313,7 +313,7 @@ class GeneticOptimizer(Optimizer):
         if self.metric is None:
             raise ValueError("No metric provided for optimization.")
 
-        prompt_annotations = {key: [] for key in batch[0]["prompts"].keys()}
+        prompt_annotations = {key: [] for key in batch[0]["prompts"]}
         candidates = {}
         for sample in batch:
             input_ouputs = sample["prompts"]
@@ -469,7 +469,7 @@ class GeneticOptimizer(Optimizer):
             raise ValueError("No llm provided for optimization.")
 
         improved_candidate = {}
-        for key in candidate.keys():
+        for key in candidate:
             feedback = feedbacks[key]
             if feedback:
                 feedback_input = FeedbackMutationPromptInput(
@@ -509,7 +509,7 @@ class GeneticOptimizer(Optimizer):
         traces = [trace[self.metric.name] for trace in results.traces]
         if indices:
             feedback_candidates = {}
-            for prompt_name in candidate.keys():
+            for prompt_name in candidate:
                 feedback_data = [
                     FeedbackExample(
                         input=dict_to_str(
@@ -536,7 +536,7 @@ class GeneticOptimizer(Optimizer):
                 feedback_candidates[prompt_name] = feedbacks.feedbacks
         else:
             logger.warning("No samples found for the feedback generation.")
-            feedback_candidates = {prompt_name: [] for prompt_name in candidate.keys()}
+            feedback_candidates = {prompt_name: [] for prompt_name in candidate}
 
         return feedback_candidates
 
@@ -651,7 +651,7 @@ class GeneticOptimizer(Optimizer):
             raise ValueError("The parents must have the same prompt names.")
 
         chain_offsprings = {}
-        for key in parent_x.keys():
+        for key in parent_x:
             offspring = await self._cross_over_prompts(
                 parent_x[key], parent_y[key], callbacks
             )
@@ -713,8 +713,7 @@ class GeneticOptimizer(Optimizer):
         )
 
         offspring_candidates = []
-        for idx, candidate in enumerate(candidates):
-            parent_x = candidates[idx]
+        for idx, parent_x in enumerate(candidates):
             parent_y = candidates[np.argmin(distance_matrix[idx])]
             exec.submit(
                 self._cross_over_chain,

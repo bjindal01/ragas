@@ -218,7 +218,7 @@ def test_ignored_columns_validation():
     metric.required_columns = valid_columns_with_ignored
 
     # Test that validation fails for invalid base columns with :ignored suffix
-    with pytest.raises(ValueError, match="Invalid column.*must be one of"):
+    with pytest.raises(ValueError, match=r"Invalid column.*must be one of"):
         invalid_columns_with_ignored = {
             MetricType.SINGLE_TURN: {
                 "user_input",
@@ -228,7 +228,7 @@ def test_ignored_columns_validation():
         metric.required_columns = invalid_columns_with_ignored
 
     # Test mixed valid and invalid columns
-    with pytest.raises(ValueError, match="Invalid column.*must be one of"):
+    with pytest.raises(ValueError, match=r"Invalid column.*must be one of"):
         mixed_columns = {
             MetricType.SINGLE_TURN: {
                 "user_input",

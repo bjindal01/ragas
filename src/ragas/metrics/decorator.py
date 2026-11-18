@@ -80,7 +80,7 @@ class RankingMetricProtocol(BaseMetricProtocol, Protocol):
     allowed_values: int  # Expected list length
 
 
-def create_metric_decorator():
+def create_metric_decorator():  # noqa: C901
     """
     Factory function that creates decorator factories for different metric types.
 
@@ -88,7 +88,7 @@ def create_metric_decorator():
         A decorator factory function that determines the metric type based on allowed_values
     """
 
-    def decorator_factory(
+    def decorator_factory(  # noqa: C901
         name: t.Optional[str] = None,
         **metric_params,
     ):
@@ -104,7 +104,7 @@ def create_metric_decorator():
             A decorator function
         """
 
-        def decorator(func):
+        def decorator(func):  # noqa: C901
             # Get metric name and check if function is async
             metric_name = name or func.__name__
             is_async = inspect.iscoroutinefunction(func)
@@ -145,7 +145,7 @@ def create_metric_decorator():
                     corrections = []
                     for i, param_name in enumerate(func_param_names):
                         if i < len(args):
-                            corrections.append(f"{param_name}={repr(args[i])}")
+                            corrections.append(f"{param_name}={args[i]!r}")
                         else:
                             corrections.append(f"{param_name}=...")
 
@@ -206,7 +206,7 @@ def create_metric_decorator():
                         error_msg = error["msg"]
                         input_value = error.get("input", "N/A")
 
-                        msg += f"   - {field}: {error_msg} (got: {repr(input_value)})\n"
+                        msg += f"   - {field}: {error_msg} (got: {input_value!r})\n"
 
                     return msg
 
@@ -222,7 +222,9 @@ def create_metric_decorator():
                     except Exception as e:
                         # Fallback if model creation fails
                         warnings.warn(
-                            f"Could not create validation model: {e}", UserWarning
+                            f"Could not create validation model: {e}",
+                            UserWarning,
+                            stacklevel=2,
                         )
                         return
 
@@ -235,6 +237,7 @@ def create_metric_decorator():
                             f"⚠️  {self.name} received unknown arguments: {', '.join(sorted(unknown))}\n"
                             f"   Valid arguments: {', '.join(sorted(valid_params))}",
                             UserWarning,
+                            stacklevel=2,
                         )
 
                     # Validate using Pydantic (only for valid parameters)
@@ -248,7 +251,7 @@ def create_metric_decorator():
                         # Store the validated data for use in execution
                         self._validated_data = validated_data.model_dump()
                     except ValidationError as e:
-                        raise TypeError(self._format_pydantic_errors(e))
+                        raise TypeError(self._format_pydantic_errors(e)) from e
 
                 def score(self, *args, **kwargs):
                     """Synchronous scoring method that wraps ascore()."""
@@ -300,7 +303,7 @@ def create_metric_decorator():
 
                     except Exception as e:
                         # Handle errors gracefully
-                        error_msg = f"Error executing metric {self.name}: {str(e)}"
+                        error_msg = f"Error executing metric {self.name}: {e!s}"
                         return MetricResult(value=None, reason=error_msg)
 
                 def __call__(self, *args, **kwargs):
