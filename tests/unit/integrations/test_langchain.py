@@ -7,16 +7,16 @@ import pytest
 pytest.importorskip("langchain.chains.base")
 pytest.importorskip("langsmith.evaluation")
 
-from langchain.schema import RUN_KEY  # noqa: E402
-from langchain_core.documents import Document  # noqa: E402
-from langchain_core.embeddings import FakeEmbeddings  # noqa: E402
-from langchain_core.language_models import FakeListChatModel  # noqa: E402
+from langchain.schema import RUN_KEY
+from langchain_core.documents import Document
+from langchain_core.embeddings import FakeEmbeddings
+from langchain_core.language_models import FakeListChatModel
 
-from ragas.dataset_schema import SingleTurnSample  # noqa: E402
-from ragas.embeddings.base import LangchainEmbeddingsWrapper  # noqa: E402
-from ragas.integrations.langchain import EvaluatorChain  # noqa: E402
-from ragas.llms.base import LangchainLLMWrapper  # noqa: E402
-from ragas.metrics.base import (  # noqa: E402
+from ragas.dataset_schema import SingleTurnSample
+from ragas.embeddings.base import LangchainEmbeddingsWrapper
+from ragas.integrations.langchain import EvaluatorChain
+from ragas.llms.base import LangchainLLMWrapper
+from ragas.metrics.base import (
     MetricType,
     MetricWithEmbeddings,
     MetricWithLLM,

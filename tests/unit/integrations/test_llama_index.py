@@ -12,7 +12,7 @@ from ragas.messages import AIMessage, HumanMessage, ToolCall, ToolMessage
 
 pytest.importorskip("llama_index.core")
 
-from ragas.integrations import llama_index as li_integration  # noqa: E402
+from ragas.integrations import llama_index as li_integration
 
 
 class _Node:

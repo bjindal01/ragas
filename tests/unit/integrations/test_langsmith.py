@@ -7,11 +7,11 @@ import pytest
 pytest.importorskip("langchain.smith")
 pytest.importorskip("langchain.chains.base")
 
-from langsmith.utils import LangSmithNotFoundError  # noqa: E402
+from langsmith.utils import LangSmithNotFoundError
 
-from ragas.integrations import langsmith as ls_integration  # noqa: E402
-from ragas.integrations.langchain import EvaluatorChain  # noqa: E402
-from ragas.metrics.base import MetricType, SingleTurnMetric  # noqa: E402
+from ragas.integrations import langsmith as ls_integration
+from ragas.integrations.langchain import EvaluatorChain
+from ragas.metrics.base import MetricType, SingleTurnMetric
 
 
 @dataclass

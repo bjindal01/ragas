@@ -43,7 +43,7 @@ def _sample(**kwargs) -> SingleTurnSample:
 
 
 class TestNvAnswerAccuracy:
-    SAMPLE = dict(user_input="When?", response="In 1879.", reference="1879")
+    SAMPLE = {"user_input": "When?", "response": "In 1879.", "reference": "1879"}
 
     @pytest.mark.asyncio
     async def test_averages_two_judges(self):
