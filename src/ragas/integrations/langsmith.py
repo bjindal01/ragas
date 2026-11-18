@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import typing as t
 
-from langchain.smith import RunEvalConfig
+# langchain 1.x moved these to langchain-classic, so this module only imports
+# with langchain<1.
+from langchain.smith import RunEvalConfig  # pyright: ignore[reportMissingImports]
 
 from ragas.integrations.langchain import EvaluatorChain
 

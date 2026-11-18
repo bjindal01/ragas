@@ -71,7 +71,11 @@ class RagasDSPyLM:
         str
             Generated completion.
         """
-        from ragas.llms.prompt import PromptValue
+        # TODO: ragas.llms.prompt does not exist, so this call path raises
+        # ModuleNotFoundError until it is ported to the current prompt API.
+        from ragas.llms.prompt import (  # pyright: ignore[reportMissingImports]
+            PromptValue,
+        )
 
         prompt_value = PromptValue(prompt_str="", messages=messages)
 

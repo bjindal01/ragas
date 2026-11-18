@@ -40,7 +40,7 @@ def pydantic_prompt_to_dspy_signature(
         A DSPy Signature class.
     """
     try:
-        import dspy
+        import dspy  # pyright: ignore[reportMissingImports]
     except ImportError as e:
         raise ImportError(
             "DSPy optimizer requires dspy-ai. Install with:\n"
@@ -88,7 +88,7 @@ def ragas_dataset_to_dspy_examples(
         List of DSPy examples for training.
     """
     try:
-        import dspy
+        import dspy  # pyright: ignore[reportMissingImports]
     except ImportError as e:
         raise ImportError(
             "DSPy optimizer requires dspy-ai. Install with:\n"

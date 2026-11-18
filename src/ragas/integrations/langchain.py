@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import typing as t
 
-from langchain.chains.base import Chain
-from langchain.schema import RUN_KEY
+# langchain 1.x moved these to langchain-classic, so this module only imports
+# with langchain<1.
+from langchain.chains.base import Chain  # pyright: ignore[reportMissingImports]
+from langchain.schema import RUN_KEY  # pyright: ignore[reportMissingImports]
 from langchain_core.documents import Document as LCDocument
 from langchain_openai.chat_models import ChatOpenAI
 from langchain_openai.embeddings import OpenAIEmbeddings
@@ -23,7 +25,7 @@ from ragas.run_config import RunConfig
 from ragas.utils import convert_row_v1_to_v2, get_or_init, get_required_columns_v1
 
 if t.TYPE_CHECKING:
-    from langchain.callbacks.manager import (
+    from langchain_core.callbacks.manager import (
         AsyncCallbackManagerForChainRun,
         CallbackManagerForChainRun,
     )

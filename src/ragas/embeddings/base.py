@@ -490,7 +490,9 @@ class HuggingfaceEmbeddings(BaseRagasEmbeddings):
         """
         Embed multiple documents.
         """
-        from sentence_transformers.SentenceTransformer import SentenceTransformer
+        from sentence_transformers.SentenceTransformer import (  # pyright: ignore[reportMissingImports]
+            SentenceTransformer,
+        )
         from torch import Tensor
 
         assert isinstance(self.model, SentenceTransformer), (

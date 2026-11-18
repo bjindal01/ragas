@@ -158,7 +158,10 @@ exclude = ["@types/*"]
 pythonVersion = "3.9"
 pythonPlatform = "All"
 typeCheckingMode = "basic"
-reportMissingImports = false
+# Optional dependencies are imported lazily and carry a per-line
+# `# pyright: ignore[reportMissingImports]`, so any other unresolved import
+# (a typo, or a module removed upstream) fails the type check.
+reportMissingImports = "error"
 reportOptionalMemberAccess = "warning"
 reportOptionalSubscript = "warning"
 reportGeneralTypeIssues = "warning"

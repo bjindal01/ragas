@@ -26,7 +26,10 @@ from ragas.run_config import RunConfig, add_async_retry
 # the legacy copies were removed from ``langchain-community`` in 0.4 (the
 # release line that accompanies langchain 1.x), so both locations are optional.
 try:
-    from langchain_google_vertexai import ChatVertexAI, VertexAI
+    from langchain_google_vertexai import (  # pyright: ignore[reportMissingImports]
+        ChatVertexAI,
+        VertexAI,
+    )
 except ImportError:
     try:
         from langchain_community.chat_models.vertexai import ChatVertexAI

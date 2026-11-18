@@ -572,7 +572,7 @@ def quickstart(  # noqa: C901
     temp_dir = None
 
     try:
-        import ragas_examples
+        import ragas_examples  # pyright: ignore[reportMissingImports]
 
         if ragas_examples.__file__ is not None:
             examples_root = Path(ragas_examples.__file__).parent

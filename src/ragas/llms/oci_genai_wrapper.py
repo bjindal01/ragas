@@ -21,7 +21,7 @@ except Exception:  # pragma: no cover - absence is okay
     _oci = None  # type: ignore
 
 try:  # pragma: no cover - environment dependent
-    from oci.generative_ai import (
+    from oci.generative_ai import (  # pyright: ignore[reportMissingImports]
         GenerativeAiClient as _GenerativeAiClient,  # type: ignore
     )
 except Exception:  # pragma: no cover
