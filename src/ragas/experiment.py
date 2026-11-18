@@ -43,7 +43,7 @@ def version_experiment(
         The commit hash of the versioned state
     """
     try:
-        import git
+        import git  # pyright: ignore[reportMissingImports]
     except ImportError as e:
         raise ImportError(
             "version_experiment() requires GitPython. Install it with:\n"

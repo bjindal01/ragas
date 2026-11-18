@@ -170,7 +170,7 @@ class NonLLMStringSimilarity(BaseMetric):
         self.distance_measure = distance_measure
 
         try:
-            from rapidfuzz import distance
+            from rapidfuzz import distance  # pyright: ignore[reportMissingImports]
         except ImportError as e:
             raise ImportError(
                 "rapidfuzz is required for string distance. "

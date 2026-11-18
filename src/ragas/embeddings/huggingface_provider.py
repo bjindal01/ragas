@@ -61,7 +61,9 @@ class HuggingFaceEmbeddings(BaseRagasEmbedding):
     def _setup_local_model(self):
         """Setup local sentence-transformers model."""
         try:
-            from sentence_transformers import SentenceTransformer
+            from sentence_transformers import (  # pyright: ignore[reportMissingImports]
+                SentenceTransformer,
+            )
         except ImportError as e:
             raise ImportError(
                 "Local HuggingFace models require sentence-transformers. "

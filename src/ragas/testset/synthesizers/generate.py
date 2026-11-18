@@ -35,11 +35,15 @@ if t.TYPE_CHECKING:
     from langchain_core.callbacks import Callbacks
     from langchain_core.embeddings import Embeddings as LangchainEmbeddings
     from langchain_core.language_models import BaseLanguageModel as LangchainLLM
-    from llama_index.core.base.embeddings.base import (
+    from llama_index.core.base.embeddings.base import (  # pyright: ignore[reportMissingImports]
         BaseEmbedding as LlamaIndexEmbedding,
     )
-    from llama_index.core.base.llms.base import BaseLLM as LlamaIndexLLM
-    from llama_index.core.schema import Document as LlamaIndexDocument
+    from llama_index.core.base.llms.base import (  # pyright: ignore[reportMissingImports]
+        BaseLLM as LlamaIndexLLM,
+    )
+    from llama_index.core.schema import (  # pyright: ignore[reportMissingImports]
+        Document as LlamaIndexDocument,
+    )
 
     from ragas.embeddings.base import BaseRagasEmbeddings
     from ragas.llms.base import BaseRagasLLM

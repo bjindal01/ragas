@@ -81,7 +81,9 @@ class RankingMetric(SimpleLLMMetric, RankingValidator):
         This is a placeholder method and should be implemented based on the specific metric.
         """
         try:
-            from sklearn.metrics import cohen_kappa_score
+            from sklearn.metrics import (  # pyright: ignore[reportMissingImports]
+                cohen_kappa_score,
+            )
         except ImportError as e:
             raise ImportError(
                 "scikit-learn is required for correlation calculation. "

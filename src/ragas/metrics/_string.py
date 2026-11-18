@@ -68,7 +68,7 @@ class NonLLMStringSimilarity(SingleTurnMetric):
 
     def __post_init__(self):
         try:
-            from rapidfuzz import distance
+            from rapidfuzz import distance  # pyright: ignore[reportMissingImports]
         except ImportError as e:
             raise ImportError(
                 "rapidfuzz is required for string distance. Please install it using `pip install rapidfuzz`"

@@ -9,14 +9,18 @@ from ragas.llms import BaseRagasLLM
 from ragas.run_config import RunConfig
 
 if t.TYPE_CHECKING:
-    from haystack.components.generators.azure import AzureOpenAIGenerator
-    from haystack.components.generators.hugging_face_api import (
+    from haystack.components.generators.azure import (  # pyright: ignore[reportMissingImports]
+        AzureOpenAIGenerator,
+    )
+    from haystack.components.generators.hugging_face_api import (  # pyright: ignore[reportMissingImports]
         HuggingFaceAPIGenerator,
     )
-    from haystack.components.generators.hugging_face_local import (
+    from haystack.components.generators.hugging_face_local import (  # pyright: ignore[reportMissingImports]
         HuggingFaceLocalGenerator,
     )
-    from haystack.components.generators.openai import OpenAIGenerator
+    from haystack.components.generators.openai import (  # pyright: ignore[reportMissingImports]
+        OpenAIGenerator,
+    )
 
 
 class HaystackLLMWrapper(BaseRagasLLM):
@@ -52,15 +56,19 @@ class HaystackLLMWrapper(BaseRagasLLM):
 
         # Lazy Import of required Haystack components
         try:
-            from haystack import AsyncPipeline
-            from haystack.components.generators.azure import AzureOpenAIGenerator
-            from haystack.components.generators.hugging_face_api import (
+            from haystack import AsyncPipeline  # pyright: ignore[reportMissingImports]
+            from haystack.components.generators.azure import (  # pyright: ignore[reportMissingImports]
+                AzureOpenAIGenerator,
+            )
+            from haystack.components.generators.hugging_face_api import (  # pyright: ignore[reportMissingImports]
                 HuggingFaceAPIGenerator,
             )
-            from haystack.components.generators.hugging_face_local import (
+            from haystack.components.generators.hugging_face_local import (  # pyright: ignore[reportMissingImports]
                 HuggingFaceLocalGenerator,
             )
-            from haystack.components.generators.openai import OpenAIGenerator
+            from haystack.components.generators.openai import (  # pyright: ignore[reportMissingImports]
+                OpenAIGenerator,
+            )
         except ImportError as exc:
             raise ImportError(
                 "Haystack is not installed. Please install it using `pip install haystack-ai`."
@@ -132,14 +140,18 @@ class HaystackLLMWrapper(BaseRagasLLM):
 
     def __repr__(self) -> str:
         try:
-            from haystack.components.generators.azure import AzureOpenAIGenerator
-            from haystack.components.generators.hugging_face_api import (
+            from haystack.components.generators.azure import (  # pyright: ignore[reportMissingImports]
+                AzureOpenAIGenerator,
+            )
+            from haystack.components.generators.hugging_face_api import (  # pyright: ignore[reportMissingImports]
                 HuggingFaceAPIGenerator,
             )
-            from haystack.components.generators.hugging_face_local import (
+            from haystack.components.generators.hugging_face_local import (  # pyright: ignore[reportMissingImports]
                 HuggingFaceLocalGenerator,
             )
-            from haystack.components.generators.openai import OpenAIGenerator
+            from haystack.components.generators.openai import (  # pyright: ignore[reportMissingImports]
+                OpenAIGenerator,
+            )
         except ImportError:
             return f"{self.__class__.__name__}(llm=Unknown(...))"
 

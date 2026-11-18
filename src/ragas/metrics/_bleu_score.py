@@ -18,7 +18,7 @@ class BleuScore(SingleTurnMetric):
 
     def __post_init__(self):
         try:
-            from sacrebleu import corpus_bleu
+            from sacrebleu import corpus_bleu  # pyright: ignore[reportMissingImports]
         except ImportError as e:
             raise ImportError(
                 "sacrebleu is required for bleu score. Please install it using `pip install sacrebleu`"

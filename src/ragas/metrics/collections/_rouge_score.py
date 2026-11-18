@@ -70,7 +70,9 @@ class RougeScore(BaseMetric):
         """
         # Import and check dependencies
         try:
-            from rouge_score import rouge_scorer
+            from rouge_score import (  # pyright: ignore[reportMissingImports]
+                rouge_scorer,
+            )
         except ImportError as e:
             raise ImportError(
                 "rouge_score is required for ROUGE score calculation. "

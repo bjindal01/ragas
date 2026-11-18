@@ -8,12 +8,22 @@ import typing as t
 from pydantic import BaseModel
 
 try:
-    from google.auth.transport.requests import Request
-    from google.oauth2.credentials import Credentials as UserCredentials
-    from google.oauth2.service_account import Credentials
-    from google_auth_oauthlib.flow import InstalledAppFlow
-    from googleapiclient.discovery import build
-    from googleapiclient.errors import HttpError
+    from google.auth.transport.requests import (  # pyright: ignore[reportMissingImports]
+        Request,
+    )
+    from google.oauth2.credentials import (  # pyright: ignore[reportMissingImports]
+        Credentials as UserCredentials,
+    )
+    from google.oauth2.service_account import (  # pyright: ignore[reportMissingImports]
+        Credentials,
+    )
+    from google_auth_oauthlib.flow import (  # pyright: ignore[reportMissingImports]
+        InstalledAppFlow,
+    )
+    from googleapiclient.discovery import build  # pyright: ignore[reportMissingImports]
+    from googleapiclient.errors import (  # pyright: ignore[reportMissingImports]
+        HttpError,
+    )
 
     GDRIVE_AVAILABLE = True
 except ImportError:

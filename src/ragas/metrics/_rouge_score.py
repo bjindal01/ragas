@@ -19,7 +19,9 @@ class RougeScore(SingleTurnMetric):
 
     def __post_init__(self):
         try:
-            from rouge_score import rouge_scorer
+            from rouge_score import (  # pyright: ignore[reportMissingImports]
+                rouge_scorer,
+            )
         except ImportError as e:
             raise ImportError(
                 f"{e.name} is required for rouge score. Please install it using `pip install {e.name}"

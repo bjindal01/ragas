@@ -88,7 +88,7 @@ class OverlapScoreBuilder(RelationshipBuilder):
 
     def __post_init__(self):
         try:
-            from rapidfuzz import distance
+            from rapidfuzz import distance  # pyright: ignore[reportMissingImports]
 
         except ImportError as e:
             raise ImportError(

@@ -97,7 +97,9 @@ class HuggingFaceTokenizer(BaseTokenizer):
             self._tokenizer = tokenizer
         elif model_name is not None:
             try:
-                from transformers import AutoTokenizer
+                from transformers import (  # pyright: ignore[reportMissingImports]
+                    AutoTokenizer,
+                )
             except ImportError as e:
                 raise ImportError(
                     "transformers package is required for HuggingFace tokenizers. "

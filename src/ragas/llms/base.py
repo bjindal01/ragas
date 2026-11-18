@@ -32,7 +32,9 @@ try:
     )
 except ImportError:
     try:
-        from langchain_community.chat_models.vertexai import ChatVertexAI
+        from langchain_community.chat_models.vertexai import (  # pyright: ignore[reportMissingImports]
+            ChatVertexAI,
+        )
         from langchain_community.llms import VertexAI
     except ImportError:
         ChatVertexAI = None  # type: ignore[assignment,misc]
@@ -42,7 +44,9 @@ if t.TYPE_CHECKING:
     from langchain_core.callbacks import Callbacks
     from langchain_core.messages import BaseMessage
     from langchain_core.prompt_values import PromptValue
-    from llama_index.core.base.llms.base import BaseLLM
+    from llama_index.core.base.llms.base import (  # pyright: ignore[reportMissingImports]
+        BaseLLM,
+    )
 
 
 logger = logging.getLogger(__name__)

@@ -61,7 +61,7 @@ class BleuScore(BaseMetric):
             MetricResult with BLEU score (0.0-1.0)
         """
         try:
-            from sacrebleu import corpus_bleu
+            from sacrebleu import corpus_bleu  # pyright: ignore[reportMissingImports]
         except ImportError as e:
             raise ImportError(
                 "sacrebleu is required for BLEU score calculation. "
