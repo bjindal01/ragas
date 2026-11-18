@@ -30,7 +30,7 @@ docs/                      # mkdocs site (docs.ragas.io)
 ## Prerequisites
 
 - `make`, `git`, and `curl` or `wget`. **uv** is required for everything else. `make build` and the install targets install it automatically when it is missing (see below). To install it yourself, run `curl -LsSf https://astral.sh/uv/install.sh | sh`.
-- **Python >= 3.9.** CI tests 3.9, 3.12 and 3.13 on Ubuntu, 3.11 on macOS and 3.10 on Windows. `.venv` is created with the default `python3` on PATH.
+- **Python >= 3.9.** CI tests 3.9, 3.12 and 3.13 on Ubuntu, 3.11 on macOS and 3.10 on Windows (coverage is measured on 3.12). When `.venv` does not exist yet, uv picks the interpreter: an already installed uv-managed Python is preferred over `python3` on PATH (`uv python list --only-installed` shows them). Pin it with `UV_PYTHON`, for example `UV_PYTHON=3.12 make build`.
 - **Network:** `make type` (and so `make lint` and `make build`) downloads the latest pyright on each run.
 - A full git clone (with tags) so setuptools_scm can compute the version.
 
@@ -47,9 +47,9 @@ Run everything from the repo root. Use `uv run` for any Python tool (pytest, ruf
 | All static checks | `make lint` | ruff format check, ruff lint, pyright, and the pre-commit file checks (large files, merge markers, JSON/TOML/YAML, debugger calls, private keys). This is what CI runs. |
 | Auto-format and fix | `make format` | Rewrites files (ruff format, then `ruff check --fix-only`). |
 | Type check only | `make type` | pyright on `src`; must report 0 errors. |
-| Unit tests | `RAGAS_DO_NOT_TRACK=true __RAGAS_DEBUG_TRACKING=true uv run pytest tests/unit -n auto --dist loadfile` | ~20 s; 1374 passed, 47 skipped, 1 xfailed. |
+| Unit tests | `RAGAS_DO_NOT_TRACK=true __RAGAS_DEBUG_TRACKING=true uv run pytest tests/unit -n auto --dist loadfile` | ~20 s. On Python 3.12: 1353 passed, 49 skipped, 1 xfailed. |
 | One file / one test | `RAGAS_DO_NOT_TRACK=true uv run pytest tests/unit/test_cache.py` or `... -k test_name` | `make test k=test_name` also works. |
-| Unit tests + coverage | `make test-cov` | Fails below `fail_under = 70` (`[tool.coverage.report]` in `pyproject.toml`); currently ~72%. Writes `coverage.xml`. |
+| Unit tests + coverage | `make test-cov` | Fails below `fail_under = 70` (`[tool.coverage.report]` in `pyproject.toml`); currently ~71% on 3.12. Writes `coverage.xml`. |
 | Full local CI | `make run-ci` | `make lint`, then unit tests with `--nbmake` and `--cov` (the coverage floor applies). Run before opening a PR. |
 | Package build smoke | `make package-smoke` | Builds sdist and wheel, runs `twine check`, installs the wheel in a clean venv, imports it and runs `ragas --help`. |
 | Build only | `uv build` | Writes `dist/`. |
@@ -74,7 +74,10 @@ Run everything from the repo root. Use `uv run` for any Python tool (pytest, ruf
 
 - Unit tests must not call real LLM or embedding providers. Use the fixtures in `tests/conftest.py` (`EchoLLM`/`fake_llm`, `EchoEmbedding`/`fake_embedding`, `mock_llm`, `mock_embedding`) or `unittest.mock`.
 - Coverage is enforced: CI runs the 3.12 Ubuntu job with `--cov`, and `make run-ci` does too. New code needs tests that keep total coverage at or above 70%.
-- About 47 unit tests skip by design: `dspy-ai` and `uvloop` are not installed, and the `langchain`/`langsmith` integration tests need langchain 0.x, which only resolves on Python 3.9.
+- About 49 unit tests skip on Python 3.12, by design:
+  - `dspy-ai`, `uvloop` and `datacompy` are not in `dev-minimal`.
+  - A few tests are marked skip in the code: CSV backend limits, a flaky analytics test, and a TODO.
+  - The `langchain`/`langsmith` integration tests need langchain 0.x, which only resolves on Python 3.9.
 - Test environment variables, set by CI and `make run-ci`:
   - `RAGAS_DO_NOT_TRACK=true` disables the anonymous telemetry in `src/ragas/_analytics.py`. Set it for every local run.
   - `__RAGAS_DEBUG_TRACKING=true` logs telemetry payloads instead of sending them (developer debugging).
