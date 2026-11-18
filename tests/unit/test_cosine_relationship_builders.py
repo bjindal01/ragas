@@ -278,7 +278,7 @@ class TestCosineSimilarityBuilder:
         node2 = Node(type=NodeType.CHUNK, properties={"embedding": ["a", 0, 0]})
         kg = KnowledgeGraph(nodes=[node1, node2])
         builder = CosineSimilarityBuilder(property_name="embedding", threshold=0.5)
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             await builder.transform(kg)
 
     @pytest.mark.asyncio

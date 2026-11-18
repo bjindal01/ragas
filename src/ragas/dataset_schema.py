@@ -193,13 +193,11 @@ class RagasDataset(ABC, t.Generic[Sample]):
     @abstractmethod
     def to_list(self) -> t.List[t.Dict]:
         """Converts the samples to a list of dictionaries."""
-        pass
 
     @classmethod
     @abstractmethod
     def from_list(cls: t.Type[T], data: t.List[t.Dict]) -> T:
         """Creates an RagasDataset from a list of dictionaries."""
-        pass
 
     def validate_samples(self, samples: t.List[Sample]) -> t.List[Sample]:
         """Validates that all samples are of the same type."""
@@ -223,10 +221,10 @@ class RagasDataset(ABC, t.Generic[Sample]):
         """Converts the dataset to a Hugging Face Dataset."""
         try:
             from datasets import Dataset as HFDataset
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "datasets is not installed. Please install it to use this function."
-            )
+            ) from e
 
         return HFDataset.from_list(self.to_list())
 
@@ -239,10 +237,10 @@ class RagasDataset(ABC, t.Generic[Sample]):
         """Converts the dataset to a pandas DataFrame."""
         try:
             import pandas as pd
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "pandas is not installed. Please install it to use this function."
-            )
+            ) from e
 
         data = self.to_list()
         return pd.DataFrame(data)
@@ -435,13 +433,11 @@ class EvaluationResult:
 
     def __post_init__(self):
         # transform scores from list of dicts to dict of lists
-        self._scores_dict = {
-            k: [d[k] for d in self.scores] for k in self.scores[0].keys()
-        }
+        self._scores_dict = {k: [d[k] for d in self.scores] for k in self.scores[0]}
 
         values = []
         self._repr_dict = {}
-        for metric_name in self._scores_dict.keys():
+        for metric_name in self._scores_dict:
             value = safe_nanmean(self._scores_dict[metric_name])
             self._repr_dict[metric_name] = value
             if metric_name not in self.binary_columns:
@@ -482,10 +478,10 @@ class EvaluationResult:
         """
         try:
             import pandas as pd
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "pandas is not installed. Please install it to use this function."
-            )
+            ) from e
 
         if self.dataset is None:
             raise ValueError("dataset is not provided for the results class")
@@ -519,7 +515,7 @@ class EvaluationResult:
         self,
         cost_per_input_token: t.Optional[float] = None,
         cost_per_output_token: t.Optional[float] = None,
-        per_model_costs: t.Dict[str, t.Tuple[float, float]] = {},
+        per_model_costs: t.Optional[t.Dict[str, t.Tuple[float, float]]] = None,
     ) -> float:
         """
         Compute the total cost of the evaluation.
@@ -547,6 +543,8 @@ class EvaluationResult:
             raise ValueError(
                 "The evaluate() run was not configured for computing cost. Please provide a token_usage_parser function to evaluate() to compute cost."
             )
+        if per_model_costs is None:
+            per_model_costs = {}
         return self.cost_cb.total_cost(
             cost_per_input_token, cost_per_output_token, per_model_costs
         )
@@ -611,7 +609,8 @@ class MetricAnnotation(BaseModel):
     @classmethod
     def from_json(cls, path: str, metric_name: t.Optional[str]) -> "MetricAnnotation":
         """Load annotations from a JSON file"""
-        dataset = json.load(open(path))
+        with open(path) as f:
+            dataset = json.load(f)
         return cls._process_dataset(dataset, metric_name)
 
     def __len__(self):
@@ -643,7 +642,8 @@ class SingleMetricAnnotation(BaseModel):
 
     @classmethod
     def from_json(cls, path) -> "SingleMetricAnnotation":
-        dataset = json.load(open(path))
+        with open(path) as f:
+            dataset = json.load(f)
 
         return cls(
             name=dataset["name"],

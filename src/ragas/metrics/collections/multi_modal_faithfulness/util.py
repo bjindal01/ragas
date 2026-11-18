@@ -72,16 +72,13 @@ def is_image_path_or_url(item: str) -> bool:
             if ext.lower() in COMMON_IMAGE_EXTENSIONS:
                 return True
             # Could be an image URL without extension
-            return True if parsed.scheme in ALLOWED_URL_SCHEMES else False
+            return parsed.scheme in ALLOWED_URL_SCHEMES
     except ValueError:
         pass
 
     # Check for local file path with image extension
     _, ext = os.path.splitext(item)
-    if ext.lower() in COMMON_IMAGE_EXTENSIONS:
-        return True
-
-    return False
+    return ext.lower() in COMMON_IMAGE_EXTENSIONS
 
 
 def process_image_to_base64(item: str) -> t.Optional[t.Dict[str, str]]:

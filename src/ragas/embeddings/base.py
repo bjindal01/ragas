@@ -19,7 +19,9 @@ from ragas.embeddings.utils import run_async_in_current_loop, validate_texts
 from ragas.run_config import RunConfig, add_async_retry, add_retry
 
 if t.TYPE_CHECKING:
-    from llama_index.core.base.embeddings.base import BaseEmbedding
+    from llama_index.core.base.embeddings.base import (  # pyright: ignore[reportMissingImports]
+        BaseEmbedding,
+    )
     from pydantic import GetCoreSchemaHandler
 
 
@@ -58,7 +60,6 @@ class BaseRagasEmbedding(ABC):
         Returns:
             List of floats representing the embedding
         """
-        pass
 
     @abstractmethod
     async def aembed_text(self, text: str, **kwargs: t.Any) -> t.List[float]:
@@ -71,7 +72,6 @@ class BaseRagasEmbedding(ABC):
         Returns:
             List of floats representing the embedding
         """
-        pass
 
     def embed_texts(self, texts: t.List[str], **kwargs: t.Any) -> t.List[t.List[float]]:
         """Embed multiple texts.
@@ -377,10 +377,10 @@ class LangchainEmbeddingsWrapper(BaseRagasEmbeddings):
         if isinstance(self.embeddings, OpenAIEmbeddings):
             try:
                 from openai import RateLimitError
-            except ImportError:
+            except ImportError as e:
                 raise ImportError(
                     "openai.error.RateLimitError not found. Please install openai package as `pip install openai`"
-                )
+                ) from e
             self.embeddings.request_timeout = run_config.timeout
             self.run_config.exception_types = RateLimitError
 
@@ -448,9 +448,9 @@ class HuggingfaceEmbeddings(BaseRagasEmbeddings):
         """
         super().__init__(cache=self.cache)
         try:
-            import sentence_transformers
+            import sentence_transformers  # pyright: ignore[reportMissingImports]
             from transformers import AutoConfig  # type: ignore
-            from transformers.models.auto.modeling_auto import (
+            from transformers.models.auto.modeling_auto import (  # pyright: ignore[reportMissingImports]
                 MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES,
             )
         except ImportError as exc:
@@ -492,8 +492,10 @@ class HuggingfaceEmbeddings(BaseRagasEmbeddings):
         """
         Embed multiple documents.
         """
-        from sentence_transformers.SentenceTransformer import SentenceTransformer
-        from torch import Tensor
+        from sentence_transformers.SentenceTransformer import (  # pyright: ignore[reportMissingImports]
+            SentenceTransformer,
+        )
+        from torch import Tensor  # pyright: ignore[reportMissingImports]
 
         assert isinstance(self.model, SentenceTransformer), (
             "Model is not of the type Bi-encoder"
@@ -509,8 +511,10 @@ class HuggingfaceEmbeddings(BaseRagasEmbeddings):
         """
         Make predictions using a cross-encoder model.
         """
-        from sentence_transformers.cross_encoder import CrossEncoder
-        from torch import Tensor
+        from sentence_transformers.cross_encoder import (  # pyright: ignore[reportMissingImports]
+            CrossEncoder,
+        )
+        from torch import Tensor  # pyright: ignore[reportMissingImports]
 
         assert isinstance(self.model, CrossEncoder), (
             "Model is not of the type CrossEncoder"

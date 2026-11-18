@@ -88,12 +88,12 @@ class OverlapScoreBuilder(RelationshipBuilder):
 
     def __post_init__(self):
         try:
-            from rapidfuzz import distance
+            from rapidfuzz import distance  # pyright: ignore[reportMissingImports]
 
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "rapidfuzz is required for string distance. Please install it using `pip install rapidfuzz`"
-            )
+            ) from e
 
         self.distance_measure_map = {
             DistanceMeasure.LEVENSHTEIN: distance.Levenshtein,
@@ -127,9 +127,6 @@ class OverlapScoreBuilder(RelationshipBuilder):
         return noisy_list
 
     async def transform(self, kg: KnowledgeGraph) -> t.List[Relationship]:
-        if self.property_name is None:
-            self.property_name
-
         distance_measure = self.distance_measure_map[self.distance_measure]
         noisy_items = self._get_noisy_items(kg.nodes, self.property_name)
         relationships = []

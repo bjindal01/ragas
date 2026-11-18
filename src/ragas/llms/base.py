@@ -26,10 +26,15 @@ from ragas.run_config import RunConfig, add_async_retry
 # the legacy copies were removed from ``langchain-community`` in 0.4 (the
 # release line that accompanies langchain 1.x), so both locations are optional.
 try:
-    from langchain_google_vertexai import ChatVertexAI, VertexAI
+    from langchain_google_vertexai import (  # pyright: ignore[reportMissingImports]
+        ChatVertexAI,
+        VertexAI,
+    )
 except ImportError:
     try:
-        from langchain_community.chat_models.vertexai import ChatVertexAI
+        from langchain_community.chat_models.vertexai import (  # pyright: ignore[reportMissingImports]
+            ChatVertexAI,
+        )
         from langchain_community.llms import VertexAI
     except ImportError:
         ChatVertexAI = None  # type: ignore[assignment,misc]
@@ -39,7 +44,9 @@ if t.TYPE_CHECKING:
     from langchain_core.callbacks import Callbacks
     from langchain_core.messages import BaseMessage
     from langchain_core.prompt_values import PromptValue
-    from llama_index.core.base.llms.base import BaseLLM
+    from llama_index.core.base.llms.base import (  # pyright: ignore[reportMissingImports]
+        BaseLLM,
+    )
 
 
 logger = logging.getLogger(__name__)
@@ -59,10 +66,7 @@ if ChatVertexAI is not None and VertexAI is not None:
 
 def is_multiple_completion_supported(llm: BaseLanguageModel) -> bool:
     """Return whether the given LLM supports n-completion."""
-    for llm_type in MULTIPLE_COMPLETION_SUPPORTED:
-        if isinstance(llm, llm_type):
-            return True
-    return False
+    return any(isinstance(llm, llm_type) for llm_type in MULTIPLE_COMPLETION_SUPPORTED)
 
 
 @dataclass
@@ -345,15 +349,13 @@ class LangchainLLMWrapper(BaseRagasLLM):
         self.run_config = run_config
 
         # configure if using OpenAI API
-        if isinstance(self.langchain_llm, BaseOpenAI) or isinstance(
-            self.langchain_llm, ChatOpenAI
-        ):
+        if isinstance(self.langchain_llm, (BaseOpenAI, ChatOpenAI)):
             try:
                 from openai import RateLimitError
-            except ImportError:
+            except ImportError as e:
                 raise ImportError(
                     "openai.error.RateLimitError not found. Please install openai package as `pip install openai`"
-                )
+                ) from e
             self.langchain_llm.request_timeout = run_config.timeout
             self.run_config.exception_types = RateLimitError
 
@@ -569,10 +571,7 @@ def _is_new_google_genai_client(client: t.Any) -> bool:
         return True
 
     # Check class name as fallback (new SDK uses Client, old uses GenerativeModel)
-    if client_class == "Client" and "genai" in client_module.lower():
-        return True
-
-    return False
+    return bool(client_class == "Client" and "genai" in client_module.lower())
 
 
 def _get_instructor_client(
@@ -746,14 +745,14 @@ def llm_factory(
         raise ValueError(
             f"Failed to initialize {provider} client with {adapter} adapter. "
             f"Ensure you've created a valid {provider} client.\n"
-            f"Error: {str(e)}"
-        )
+            f"Error: {e!s}"
+        ) from e
     except Exception as e:
         raise ValueError(
             f"Failed to initialize {provider} client with {adapter} adapter. "
             f"Ensure you've created a valid {provider} client.\n"
-            f"Error: {str(e)}"
-        )
+            f"Error: {e!s}"
+        ) from e
 
     track(
         LLMUsageEvent(
@@ -914,14 +913,14 @@ class InstructorLLM(InstructorBaseRagasLLM):
             # O-series reasoning models (o1, o1-mini, o1-2024-12-17, o2, o3, o4, o5, o6, o7, o8, o9)
             # Pattern: "o" followed by single digit 1-9, then optional "-" or end of string
             # TODO: Update to support o10+ when OpenAI releases models beyond o9
+            # Allow single digit o-series: o1, o2, ..., o9
             if (
                 len(model_str) >= 2
                 and model_str[0] == "o"
                 and model_str[1] in "123456789"
+                and (len(model_str) == 2 or model_str[2] in ("-", "_"))
             ):
-                # Allow single digit o-series: o1, o2, ..., o9
-                if len(model_str) == 2 or model_str[2] in ("-", "_"):
-                    return True
+                return True
 
             # GPT-5 and newer generation models (gpt-5, gpt-5.2, gpt-5-*, gpt-6, ..., gpt-19)
             # Pattern: "gpt-" followed by single or double digit major version >= 5
@@ -939,10 +938,7 @@ class InstructorLLM(InstructorBaseRagasLLM):
                     pass
 
             # Other specific reasoning models
-            if model_str == "codex-mini":
-                return True
-
-            return False
+            return model_str == "codex-mini"
 
         # Amazon Bedrock prefixes OpenAI model IDs with ``openai.`` and may
         # add a region prefix such as ``us.`` or ``global.``. Keep the original
@@ -1007,32 +1003,32 @@ class InstructorLLM(InstructorBaseRagasLLM):
             if hasattr(self.client, "client"):
                 underlying = self.client.client
                 # For OpenAI/Anthropic async clients
-                if hasattr(underlying, "chat") and hasattr(
-                    underlying.chat, "completions"
+                if (
+                    hasattr(underlying, "chat")
+                    and hasattr(underlying.chat, "completions")
+                    and hasattr(underlying.chat.completions, "create")
+                    and inspect.iscoroutinefunction(underlying.chat.completions.create)
                 ):
-                    if hasattr(underlying.chat.completions, "create"):
-                        if inspect.iscoroutinefunction(
-                            underlying.chat.completions.create
-                        ):
-                            return True
+                    return True
                 # For Google genai async clients
-                if hasattr(underlying, "create"):
-                    if inspect.iscoroutinefunction(underlying.create):
-                        return True
+                if hasattr(underlying, "create") and inspect.iscoroutinefunction(
+                    underlying.create
+                ):
+                    return True
 
             # Check if this is an async client by checking for a coroutine method
-            if hasattr(self.client, "chat") and hasattr(
-                self.client.chat, "completions"
+            if (
+                hasattr(self.client, "chat")
+                and hasattr(self.client.chat, "completions")
+                and hasattr(self.client.chat.completions, "create")
             ):
-                if hasattr(self.client.chat.completions, "create"):
-                    return inspect.iscoroutinefunction(
-                        self.client.chat.completions.create
-                    )
+                return inspect.iscoroutinefunction(self.client.chat.completions.create)
 
             # For Google genai clients, check for create method directly
-            if hasattr(self.client, "create"):
-                if inspect.iscoroutinefunction(self.client.create):
-                    return True
+            if hasattr(self.client, "create") and inspect.iscoroutinefunction(
+                self.client.create
+            ):
+                return True
 
             # For instructor-wrapped clients, also check the closure of create_fn
             # This handles cases where the underlying client is stored in a closure
@@ -1045,20 +1041,23 @@ class InstructorLLM(InstructorBaseRagasLLM):
                     try:
                         obj = cell.cell_contents
                         # Check if the closure object is an async client
-                        if hasattr(obj, "chat") and hasattr(obj.chat, "completions"):
-                            if hasattr(obj.chat.completions, "create"):
-                                if inspect.iscoroutinefunction(
-                                    obj.chat.completions.create
-                                ):
-                                    return True
+                        if (
+                            hasattr(obj, "chat")
+                            and hasattr(obj.chat, "completions")
+                            and hasattr(obj.chat.completions, "create")
+                            and inspect.iscoroutinefunction(obj.chat.completions.create)
+                        ):
+                            return True
                         # Also check for acompletion (e.g., litellm Router)
-                        if hasattr(obj, "acompletion"):
-                            if inspect.iscoroutinefunction(obj.acompletion):
-                                return True
+                        if hasattr(obj, "acompletion") and inspect.iscoroutinefunction(
+                            obj.acompletion
+                        ):
+                            return True
                         # Also check for Google genai create method
-                        if hasattr(obj, "create"):
-                            if inspect.iscoroutinefunction(obj.create):
-                                return True
+                        if hasattr(obj, "create") and inspect.iscoroutinefunction(
+                            obj.create
+                        ):
+                            return True
                     except (ValueError, AttributeError):
                         # cell_contents might not be accessible
                         pass
@@ -1253,7 +1252,7 @@ class InstructorLLM(InstructorBaseRagasLLM):
                 config_parts.append(f"{arg}={self.model_args[arg]}")
 
         # Show count of other args if there are any
-        other_args = len([k for k in self.model_args.keys() if k not in important_args])
+        other_args = len([k for k in self.model_args if k not in important_args])
         if other_args > 0:
             config_parts.append(f"+{other_args} more")
 

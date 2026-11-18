@@ -1,3 +1,5 @@
+import contextlib
+
 from langchain_core.documents import Document
 
 from ragas.embeddings import BaseRagasEmbeddings
@@ -69,17 +71,15 @@ def test_generate_with_chunks_creates_chunk_nodes():
         Document(page_content="Second chunk content", metadata={"source": "doc1"}),
     ]
 
-    # use empty transforms to skip LLM calls
-    try:
+    # use empty transforms to skip LLM calls; the ValueError is expected
+    # because no synthesizers can work without proper transforms
+    with contextlib.suppress(ValueError):
         generator.generate_with_chunks(
             chunks=chunks,
             testset_size=1,
             transforms=[],
             return_executor=True,
         )
-    except ValueError:
-        # expected - no synthesizers can work without proper transforms
-        pass
 
     kg = generator.knowledge_graph
 
@@ -95,15 +95,13 @@ def test_generate_with_chunks_accepts_strings():
 
     chunks = ["First chunk as string", "Second chunk as string"]
 
-    try:
+    with contextlib.suppress(ValueError):
         generator.generate_with_chunks(
             chunks=chunks,
             testset_size=1,
             transforms=[],
             return_executor=True,
         )
-    except ValueError:
-        pass
 
     kg = generator.knowledge_graph
 
@@ -128,15 +126,13 @@ def test_generate_with_chunks_filters_empty_content():
         "   ",  # whitespace string
     ]
 
-    try:
+    with contextlib.suppress(ValueError):
         generator.generate_with_chunks(
             chunks=chunks,
             testset_size=1,
             transforms=[],
             return_executor=True,
         )
-    except ValueError:
-        pass
 
     kg = generator.knowledge_graph
 
@@ -152,15 +148,13 @@ def test_generate_with_chunks_handles_empty_sequence():
 
     chunks = []
 
-    try:
+    with contextlib.suppress(ValueError):
         generator.generate_with_chunks(
             chunks=chunks,
             testset_size=1,
             transforms=[],
             return_executor=True,
         )
-    except ValueError:
-        pass
 
     kg = generator.knowledge_graph
     assert len(kg.nodes) == 0

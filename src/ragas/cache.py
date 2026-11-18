@@ -30,7 +30,6 @@ class CacheInterface(ABC):
         Returns:
             The cached value associated with the key.
         """
-        pass
 
     @abstractmethod
     def set(self, key: str, value) -> None:
@@ -40,7 +39,6 @@ class CacheInterface(ABC):
             key: The key to store the value under.
             value: The value to cache.
         """
-        pass
 
     @abstractmethod
     def has_key(self, key: str) -> bool:
@@ -52,7 +50,6 @@ class CacheInterface(ABC):
         Returns:
             True if the key exists in the cache, False otherwise.
         """
-        pass
 
     @classmethod
     def __get_pydantic_core_schema__(
@@ -80,10 +77,10 @@ class DiskCacheBackend(CacheInterface):
     def __init__(self, cache_dir: str = ".cache"):
         try:
             from diskcache import Cache
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "For using the diskcache backend, please install it with `pip install diskcache`."
-            )
+            ) from e
 
         self.cache = Cache(cache_dir)
 

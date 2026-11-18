@@ -213,7 +213,7 @@ class TestExperimentDecorator:
 
         # Test that decorator creates proper wrapper
         assert hasattr(simple_experiment, "arun")
-        assert hasattr(simple_experiment, "__call__")
+        assert callable(simple_experiment)
 
         # Test calling the wrapped function directly
         test_row = SampleDataRow(question="Test?", answer="test answer", score=0.5)

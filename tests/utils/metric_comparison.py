@@ -327,7 +327,7 @@ def export_comparison_results(
     df = result.to_dataframe()
 
     # Add dataset information
-    for key in dataset[0].keys():
+    for key in dataset[0]:
         df[key] = [sample.get(key, "") for sample in dataset]
 
     # Add summary statistics as a separate row

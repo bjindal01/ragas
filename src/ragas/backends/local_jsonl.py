@@ -60,9 +60,7 @@ class LocalJSONLBackend(BaseBackend):
 
     def _serialize_datetime(self, obj: t.Any) -> t.Any:
         """Serialize datetime objects to ISO format strings."""
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        elif isinstance(obj, date):
+        if isinstance(obj, (datetime, date)):
             return obj.isoformat()
         elif isinstance(obj, dict):
             return {k: self._serialize_datetime(v) for k, v in obj.items()}

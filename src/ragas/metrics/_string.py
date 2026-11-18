@@ -68,11 +68,11 @@ class NonLLMStringSimilarity(SingleTurnMetric):
 
     def __post_init__(self):
         try:
-            from rapidfuzz import distance
-        except ImportError:
+            from rapidfuzz import distance  # pyright: ignore[reportMissingImports]
+        except ImportError as e:
             raise ImportError(
                 "rapidfuzz is required for string distance. Please install it using `pip install rapidfuzz`"
-            )
+            ) from e
 
         self.distance_measure_map = {
             DistanceMeasure.LEVENSHTEIN: distance.Levenshtein,

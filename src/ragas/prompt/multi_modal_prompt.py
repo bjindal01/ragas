@@ -116,7 +116,8 @@ class ImageTextPrompt(PydanticPrompt, t.Generic[InputModel, OutputModel]):
             self._generate_output_signature(),
             self._generate_examples(),
             "Now perform the above instruction with the following",
-        ] + data.to_string_list()  # type: ignore
+            *data.to_string_list(),  # type: ignore
+        ]
         return ImageTextPromptValue(items=text)
 
     async def generate_multiple(

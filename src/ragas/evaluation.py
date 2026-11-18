@@ -56,7 +56,7 @@ if t.TYPE_CHECKING:
 RAGAS_EVALUATION_CHAIN_NAME = "ragas evaluation"
 
 
-async def aevaluate(
+async def aevaluate(  # noqa: C901
     dataset: t.Union[Dataset, EvaluationDataset],
     metrics: t.Optional[t.Sequence[Metric]] = None,
     llm: t.Optional[BaseRagasLLM | InstructorBaseRagasLLM | LangchainLLM] = None,
@@ -186,15 +186,14 @@ async def aevaluate(
                 # Extract client from LLM if available for modern embeddings
                 embedding_client = None
                 if hasattr(llm, "client"):
-                    embedding_client = getattr(llm, "client")
+                    embedding_client = llm.client  # type: ignore[attr-defined]
                 embeddings = embedding_factory(
                     provider=inferred_provider, client=embedding_client
                 )
             metric.embeddings = embeddings
             embeddings_changed.append(i)
-        if isinstance(metric, AnswerCorrectness):
-            if metric.answer_similarity is None:
-                answer_correctness_is_set = i
+        if isinstance(metric, AnswerCorrectness) and metric.answer_similarity is None:
+            answer_correctness_is_set = i
 
         # init all the models
         metric.init(run_config)
@@ -312,7 +311,7 @@ async def aevaluate(
     else:
         # evalution run was successful
         # now lets process the results
-        cost_cb = ragas_callbacks["cost_cb"] if "cost_cb" in ragas_callbacks else None
+        cost_cb = ragas_callbacks.get("cost_cb")
         result = EvaluationResult(
             scores=scores,
             dataset=dataset,

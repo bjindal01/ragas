@@ -31,7 +31,7 @@ def exact_match_args(
         return 0.0
 
     score = 0.0
-    for arg in ref_args.keys():
+    for arg in ref_args:
         if arg in pred_args and str(pred_args[arg]) == str(ref_args[arg]):
             score += 1.0
 

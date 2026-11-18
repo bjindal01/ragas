@@ -20,7 +20,7 @@ class FakeTestLLM(BaseRagasLLM):
         n=1,
         temperature: float = 0.01,
         stop=None,
-        callbacks=[],
+        callbacks=None,
     ):
         generations = [[Generation(text=prompt.to_string())] * n]
         return LLMResult(generations=generations)
@@ -31,7 +31,7 @@ class FakeTestLLM(BaseRagasLLM):
         n=1,
         temperature: t.Optional[float] = 0.01,
         stop=None,
-        callbacks=[],
+        callbacks=None,
     ):
         temp_val = temperature if temperature is not None else 0.01
         return self.generate_text(prompt, n, temp_val, stop, callbacks)

@@ -365,7 +365,7 @@ class TestEdgeCases:
     def test_numeric_metric_with_range_type(self):
         """Test numeric metric with range type."""
 
-        @numeric_metric(name="score", allowed_values=range(0, 11))  # 0-10
+        @numeric_metric(name="score", allowed_values=range(11))  # 0-10
         def score_metric(value: int) -> int:
             return min(10, max(0, value))
 
@@ -612,7 +612,7 @@ class TestErrorHandling:
             simple_str: str,
             simple_int: int,
             optional_str: t.Optional[str] = None,
-            list_of_strings: t.List[str] = None,
+            list_of_strings: t.Optional[t.List[str]] = None,
             union_type: t.Union[str, int] = "default",
         ) -> str:
             return "pass"
@@ -813,7 +813,7 @@ class TestIDESupport:
         assert hasattr(my_metric, "ascore")
         assert hasattr(my_metric, "batch_score")
         assert hasattr(my_metric, "abatch_score")
-        assert hasattr(my_metric, "__call__")
+        assert callable(my_metric)
         assert hasattr(my_metric, "name")
         assert hasattr(my_metric, "allowed_values")
 
@@ -834,7 +834,7 @@ class TestIDESupport:
         assert hasattr(my_metric, "ascore")
         assert hasattr(my_metric, "batch_score")
         assert hasattr(my_metric, "abatch_score")
-        assert hasattr(my_metric, "__call__")
+        assert callable(my_metric)
         assert hasattr(my_metric, "name")
         assert hasattr(my_metric, "allowed_values")
 
@@ -855,7 +855,7 @@ class TestIDESupport:
         assert hasattr(my_metric, "ascore")
         assert hasattr(my_metric, "batch_score")
         assert hasattr(my_metric, "abatch_score")
-        assert hasattr(my_metric, "__call__")
+        assert callable(my_metric)
         assert hasattr(my_metric, "name")
         assert hasattr(my_metric, "allowed_values")
 

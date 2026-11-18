@@ -75,12 +75,13 @@ class LiteLLMStructuredLLM(InstructorBaseRagasLLM):
                     return True
 
             # Check for async chat completion (works with instructor-wrapped OpenAI clients)
-            if hasattr(self.client, "chat") and hasattr(
-                self.client.chat, "completions"
+            if (
+                hasattr(self.client, "chat")
+                and hasattr(self.client.chat, "completions")
+                and hasattr(self.client.chat.completions, "create")
+                and inspect.iscoroutinefunction(self.client.chat.completions.create)
             ):
-                if hasattr(self.client.chat.completions, "create"):
-                    if inspect.iscoroutinefunction(self.client.chat.completions.create):
-                        return True
+                return True
 
             # For instructor-wrapped sync clients that wrap async underlying clients,
             # check if the wrapped client has async methods
@@ -104,9 +105,10 @@ class LiteLLMStructuredLLM(InstructorBaseRagasLLM):
                     try:
                         obj = cell.cell_contents
                         # Check if the closure object has acompletion (e.g., litellm Router)
-                        if hasattr(obj, "acompletion"):
-                            if inspect.iscoroutinefunction(obj.acompletion):
-                                return True
+                        if hasattr(obj, "acompletion") and inspect.iscoroutinefunction(
+                            obj.acompletion
+                        ):
+                            return True
                     except (ValueError, AttributeError):
                         # cell_contents might not be accessible, or object might not have acompletion
                         pass

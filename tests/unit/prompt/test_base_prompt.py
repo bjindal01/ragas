@@ -6,11 +6,11 @@ from ragas.prompt.base import BasePrompt
 
 
 class DummyPrompt(BasePrompt):
-    async def generate(self, llm, data, temperature=None, stop=None, callbacks=[]):
+    async def generate(self, llm, data, temperature=None, stop=None, callbacks=None):
         return "dummy"
 
     def generate_multiple(
-        self, llm, data, n=1, temperature=None, stop=None, callbacks=[]
+        self, llm, data, n=1, temperature=None, stop=None, callbacks=None
     ):
         return ["dummy"] * n
 

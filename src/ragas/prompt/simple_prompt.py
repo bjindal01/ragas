@@ -175,7 +175,8 @@ class Prompt:
             warnings.warn(
                 "response_model cannot be saved and will be lost. "
                 "You'll need to set it manually after loading using: "
-                "Prompt.load(path, response_model=YourModel)"
+                "Prompt.load(path, response_model=YourModel)",
+                stacklevel=2,
             )
 
         data = {
@@ -195,7 +196,7 @@ class Prompt:
                 with open(file_path, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=2)
         except (OSError, IOError) as e:
-            raise ValueError(f"Cannot save prompt to {path}: {e}")
+            raise ValueError(f"Cannot save prompt to {path}: {e}") from e
 
     @classmethod
     def load(
@@ -233,7 +234,7 @@ class Prompt:
                 with open(file_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError, OSError) as e:
-            raise ValueError(f"Cannot load prompt from {path}: {e}")
+            raise ValueError(f"Cannot load prompt from {path}: {e}") from e
 
         # Validate format
         if data.get("type") != "Prompt":
@@ -293,7 +294,8 @@ class Prompt:
         ) or expected_schema.get("required") != actual_schema.get("required"):
             warnings.warn(
                 f"Provided response_model schema differs from saved model "
-                f"(expected: {expected_info['class_name']})"
+                f"(expected: {expected_info['class_name']})",
+                stacklevel=2,
             )
 
     def __str__(self) -> str:

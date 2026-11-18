@@ -48,9 +48,9 @@ def __getattr__(name):
             import ragas_experimental as experimental  # type: ignore
 
             return experimental
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "ragas.experimental requires installation: "
                 "pip install ragas[experimental]"
-            )
+            ) from e
     raise AttributeError(f"module 'ragas' has no attribute '{name}'")

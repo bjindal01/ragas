@@ -37,10 +37,7 @@ def get_cache_dir() -> str:
 
 @lru_cache(maxsize=1)
 def get_debug_mode() -> bool:
-    if os.environ.get(DEBUG_ENV_VAR, str(False)).lower() == "true":
-        return True
-    else:
-        return False
+    return os.environ.get(DEBUG_ENV_VAR, str(False)).lower() == "true"
 
 
 def safe_nanmean(arr: t.List[float]) -> float:
@@ -59,8 +56,8 @@ def check_if_sum_is_close(
     values: t.List[float], close_to: float, num_places: int
 ) -> bool:
     multiplier = 10**num_places
-    total = sum(int(round(v * multiplier)) for v in values)
-    return total == int(round(close_to * multiplier))
+    total = sum(round(v * multiplier) for v in values)
+    return total == round(close_to * multiplier)
 
 
 def patch_logger(module: str, level: int):
