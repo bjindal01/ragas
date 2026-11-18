@@ -156,11 +156,15 @@ class TestSummaryScoreE2EMigration:
             pytest.skip("Modern LLM required for parameter testing")
 
         # Test invalid coefficient (too high)
-        with pytest.raises(ValueError, match="Coefficient must be between 0.0 and 1.0"):
+        with pytest.raises(
+            ValueError, match=r"Coefficient must be between 0.0 and 1.0"
+        ):
             SummaryScore(llm=test_modern_llm, coeff=1.5)
 
         # Test invalid coefficient (negative)
-        with pytest.raises(ValueError, match="Coefficient must be between 0.0 and 1.0"):
+        with pytest.raises(
+            ValueError, match=r"Coefficient must be between 0.0 and 1.0"
+        ):
             SummaryScore(llm=test_modern_llm, coeff=-0.1)
 
         # Test valid configurations

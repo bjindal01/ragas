@@ -64,9 +64,9 @@ def create_legacy_llm(model: str = "gpt-3.5-turbo", **kwargs):
 
         return llm_factory(model, **kwargs)
     except ImportError as e:
-        raise ImportError(f"LLM factory not available: {e}")
+        raise ImportError(f"LLM factory not available: {e}") from e
     except Exception as e:
-        raise Exception(f"Could not create LLM (API key may be missing): {e}")
+        raise Exception(f"Could not create LLM (API key may be missing): {e}") from e
 
 
 def create_modern_llm(
@@ -103,9 +103,9 @@ def create_modern_llm(
 
         return llm_factory(model=model, provider=provider, client=client, **kwargs)
     except ImportError as e:
-        raise ImportError(f"LLM factory not available: {e}")
+        raise ImportError(f"LLM factory not available: {e}") from e
     except Exception as e:
-        raise Exception(f"Could not create LLM (API key may be missing): {e}")
+        raise Exception(f"Could not create LLM (API key may be missing): {e}") from e
 
 
 def create_legacy_embeddings(model: str = "text-embedding-ada-002", **kwargs):
@@ -127,11 +127,11 @@ def create_legacy_embeddings(model: str = "text-embedding-ada-002", **kwargs):
 
         return embedding_factory(model, **kwargs)
     except ImportError as e:
-        raise ImportError(f"Embedding factory not available: {e}")
+        raise ImportError(f"Embedding factory not available: {e}") from e
     except Exception as e:
         raise Exception(
             f"Could not create legacy embeddings (API key may be missing): {e}"
-        )
+        ) from e
 
 
 def create_modern_embeddings(
@@ -177,11 +177,11 @@ def create_modern_embeddings(
             **kwargs,
         )
     except ImportError as e:
-        raise ImportError(f"OpenAI or embedding factory not available: {e}")
+        raise ImportError(f"OpenAI or embedding factory not available: {e}") from e
     except Exception as e:
         raise Exception(
             f"Could not create modern embeddings (API key may be missing): {e}"
-        )
+        ) from e
 
 
 # Legacy-style factory functions for backward compatibility with langchain wrappers
@@ -205,7 +205,7 @@ def create_legacy_llm_with_langchain(model: str = "gpt-4o-mini", **kwargs):
         langchain_llm = ChatOpenAI(model=model, **kwargs)
         return LangchainLLMWrapper(langchain_llm)
     except ImportError as e:
-        raise ImportError(f"Langchain or LangchainLLMWrapper not available: {e}")
+        raise ImportError(f"Langchain or LangchainLLMWrapper not available: {e}") from e
 
 
 def create_legacy_embeddings_with_langchain(
@@ -230,4 +230,6 @@ def create_legacy_embeddings_with_langchain(
         langchain_embeddings = OpenAIEmbeddings(model=model, **kwargs)
         return LangchainEmbeddingsWrapper(langchain_embeddings)
     except ImportError as e:
-        raise ImportError(f"Langchain or LangchainEmbeddingsWrapper not available: {e}")
+        raise ImportError(
+            f"Langchain or LangchainEmbeddingsWrapper not available: {e}"
+        ) from e

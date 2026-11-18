@@ -47,8 +47,8 @@ class MultiHopAbstractQuerySynthesizer(MultiHopQuerySynthesizer):
 
         node_clusters = knowledge_graph.find_n_indirect_clusters(
             n,
-            relationship_condition=lambda rel: (
-                True if rel.get_property(self.relation_property) else False
+            relationship_condition=lambda rel: bool(
+                rel.get_property(self.relation_property)
             ),
             depth_limit=3,
         )

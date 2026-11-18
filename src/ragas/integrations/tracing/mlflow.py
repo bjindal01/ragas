@@ -6,9 +6,12 @@ import os
 import typing as t
 
 if t.TYPE_CHECKING:
-    from mlflow import get_last_active_trace_id, get_trace
-    from mlflow.entities.span import Span
-    from mlflow.entities.trace import Trace
+    from mlflow import (  # pyright: ignore[reportMissingImports]
+        get_last_active_trace_id,
+        get_trace,
+    )
+    from mlflow.entities.span import Span  # pyright: ignore[reportMissingImports]
+    from mlflow.entities.trace import Trace  # pyright: ignore[reportMissingImports]
 else:
     try:
         from mlflow import get_last_active_trace_id, get_trace  # type: ignore

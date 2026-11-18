@@ -47,11 +47,11 @@ class HuggingFaceEmbeddings(BaseRagasEmbedding):
         """Setup HuggingFace API client."""
         try:
             from huggingface_hub import InferenceClient
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "HuggingFace API support requires huggingface-hub. "
                 "Install with: pip install huggingface-hub"
-            )
+            ) from e
 
         self.client = InferenceClient(
             model=self.model,
@@ -61,12 +61,14 @@ class HuggingFaceEmbeddings(BaseRagasEmbedding):
     def _setup_local_model(self):
         """Setup local sentence-transformers model."""
         try:
-            from sentence_transformers import SentenceTransformer
-        except ImportError:
+            from sentence_transformers import (  # pyright: ignore[reportMissingImports]
+                SentenceTransformer,
+            )
+        except ImportError as e:
             raise ImportError(
                 "Local HuggingFace models require sentence-transformers. "
                 "Install with: pip install sentence-transformers"
-            )
+            ) from e
 
         self.model_instance = SentenceTransformer(
             self.model, device=self.device, **self.model_kwargs

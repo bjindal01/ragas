@@ -30,4 +30,3 @@ class StructuredOutputAdapter(ABC):
         Returns:
             InstructorBaseRagasLLM-compatible instance
         """
-        pass

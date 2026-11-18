@@ -35,11 +35,15 @@ if t.TYPE_CHECKING:
     from langchain_core.callbacks import Callbacks
     from langchain_core.embeddings import Embeddings as LangchainEmbeddings
     from langchain_core.language_models import BaseLanguageModel as LangchainLLM
-    from llama_index.core.base.embeddings.base import (
+    from llama_index.core.base.embeddings.base import (  # pyright: ignore[reportMissingImports]
         BaseEmbedding as LlamaIndexEmbedding,
     )
-    from llama_index.core.base.llms.base import BaseLLM as LlamaIndexLLM
-    from llama_index.core.schema import Document as LlamaIndexDocument
+    from llama_index.core.base.llms.base import (  # pyright: ignore[reportMissingImports]
+        BaseLLM as LlamaIndexLLM,
+    )
+    from llama_index.core.schema import (  # pyright: ignore[reportMissingImports]
+        Document as LlamaIndexDocument,
+    )
 
     from ragas.embeddings.base import BaseRagasEmbeddings
     from ragas.llms.base import BaseRagasLLM
@@ -411,7 +415,7 @@ class TestsetGenerator:
             return_executor=return_executor,
         )
 
-    def generate(
+    def generate(  # noqa: C901
         self,
         testset_size: int,
         query_distribution: t.Optional[QueryDistribution] = None,
@@ -470,10 +474,9 @@ class TestsetGenerator:
         4. Generate samples for each scenario.
         5. Compile the results into an EvaluationDataset.
         """
-        if run_config is not None:
-            # Only BaseRagasLLM has set_run_config method, not InstructorBaseRagasLLM
-            if isinstance(self.llm, BaseRagasLLM):
-                self.llm.set_run_config(run_config)
+        # Only BaseRagasLLM has set_run_config method, not InstructorBaseRagasLLM
+        if run_config is not None and isinstance(self.llm, BaseRagasLLM):
+            self.llm.set_run_config(run_config)
 
         query_distribution = query_distribution or default_query_distribution(
             self.llm, self.knowledge_graph, self.llm_context

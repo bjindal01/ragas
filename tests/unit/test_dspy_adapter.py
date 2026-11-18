@@ -54,7 +54,6 @@ class TestPydanticPromptToDSPySignature:
         which is complex and fragile. The import error is adequately tested by
         the e2e tests when dspy is not installed.
         """
-        pass
 
     @pytest.mark.skipif(not DSPY_AVAILABLE, reason="dspy-ai not installed")
     def test_field_descriptions(self):

@@ -10,10 +10,10 @@ try:
     )  # type: ignore
 
     from ragas.evaluation import RAGAS_EVALUATION_CHAIN_NAME
-except ImportError:
+except ImportError as e:
     raise ImportError(
         "Opik is not installed. Please install it using `pip install opik` to use the Opik tracer."
-    )
+    ) from e
 
 if t.TYPE_CHECKING:
     from langchain_core.tracers.schemas import Run

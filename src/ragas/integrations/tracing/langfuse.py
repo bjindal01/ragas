@@ -9,8 +9,11 @@ from datetime import datetime
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 if t.TYPE_CHECKING:
-    from langfuse import Langfuse, observe
-    from langfuse.api import Observation, TraceWithFullDetails
+    from langfuse import Langfuse, observe  # pyright: ignore[reportMissingImports]
+    from langfuse.api import (  # pyright: ignore[reportMissingImports]
+        Observation,
+        TraceWithFullDetails,
+    )
 else:
     try:
         from langfuse import Langfuse, observe  # type: ignore
@@ -136,7 +139,7 @@ async def sync_trace(
             )
             return LangfuseTrace(trace=trace)
         except Exception as e:
-            logger.debug(f"Trace {trace_id} not yet synced: {str(e)}")
+            logger.debug(f"Trace {trace_id} not yet synced: {e!s}")
 
         await asyncio.sleep(delay)
 

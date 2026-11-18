@@ -39,7 +39,9 @@ class InstructorAdapter(StructuredOutputAdapter):
         try:
             patched_client = _get_instructor_client(client, provider, mode=mode)
         except Exception as e:
-            raise ValueError(f"Failed to patch {provider} client with Instructor: {e}")
+            raise ValueError(
+                f"Failed to patch {provider} client with Instructor: {e}"
+            ) from e
 
         return InstructorLLM(
             client=patched_client,

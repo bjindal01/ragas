@@ -1,0 +1,2 @@
+# uv.lock pins the development environment; it is not needed to build or install ragas.
+exclude uv.lock

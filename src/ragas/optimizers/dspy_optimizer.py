@@ -75,7 +75,7 @@ class DSPyOptimizer(Optimizer):
 
     def __post_init__(self):
         try:
-            import dspy
+            import dspy  # pyright: ignore[reportMissingImports]
 
             self._dspy = dspy
         except ImportError as e:

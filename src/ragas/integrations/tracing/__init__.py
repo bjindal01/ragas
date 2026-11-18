@@ -60,16 +60,13 @@ def __getattr__(name: str):
             sync_trace,
         )
 
-        if name == "observe":
-            return observe
-        elif name == "logger":
-            return logger
-        elif name == "LangfuseTrace":
-            return LangfuseTrace
-        elif name == "sync_trace":
-            return sync_trace
-        elif name == "add_query_param":
-            return add_query_param
+        return {
+            "observe": observe,
+            "logger": logger,
+            "LangfuseTrace": LangfuseTrace,
+            "sync_trace": sync_trace,
+            "add_query_param": add_query_param,
+        }[name]
     elif name == "MLflowTrace":
         from .mlflow import MLflowTrace
 

@@ -29,7 +29,7 @@ class DataCompyScore(SingleTurnMetric):
         except ImportError as e:
             raise ImportError(
                 f"{e.name} is required for bleu score. Please install it using `pip install {e.name}`"
-            )
+            ) from e
 
         self.Compare = Compare
         self.pd = pd

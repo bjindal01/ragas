@@ -8,16 +8,16 @@ from ragas.embeddings.base import BaseRagasEmbeddings
 from ragas.run_config import RunConfig
 
 if t.TYPE_CHECKING:
-    from haystack.components.embedders.azure_text_embedder import (
+    from haystack.components.embedders.azure_text_embedder import (  # pyright: ignore[reportMissingImports]
         AzureOpenAITextEmbedder,
     )
-    from haystack.components.embedders.hugging_face_api_text_embedder import (
+    from haystack.components.embedders.hugging_face_api_text_embedder import (  # pyright: ignore[reportMissingImports]
         HuggingFaceAPITextEmbedder,
     )
-    from haystack.components.embedders.openai_text_embedder import (
+    from haystack.components.embedders.openai_text_embedder import (  # pyright: ignore[reportMissingImports]
         OpenAITextEmbedder,
     )
-    from haystack.components.embedders.sentence_transformers_text_embedder import (
+    from haystack.components.embedders.sentence_transformers_text_embedder import (  # pyright: ignore[reportMissingImports]
         SentenceTransformersTextEmbedder,
     )
 
@@ -55,17 +55,17 @@ class HaystackEmbeddingsWrapper(BaseRagasEmbeddings):
 
         # Lazy Import of required Haystack components
         try:
-            from haystack import AsyncPipeline
-            from haystack.components.embedders.azure_text_embedder import (
+            from haystack import AsyncPipeline  # pyright: ignore[reportMissingImports]
+            from haystack.components.embedders.azure_text_embedder import (  # pyright: ignore[reportMissingImports]
                 AzureOpenAITextEmbedder,
             )
-            from haystack.components.embedders.hugging_face_api_text_embedder import (
+            from haystack.components.embedders.hugging_face_api_text_embedder import (  # pyright: ignore[reportMissingImports]
                 HuggingFaceAPITextEmbedder,
             )
-            from haystack.components.embedders.openai_text_embedder import (
+            from haystack.components.embedders.openai_text_embedder import (  # pyright: ignore[reportMissingImports]
                 OpenAITextEmbedder,
             )
-            from haystack.components.embedders.sentence_transformers_text_embedder import (
+            from haystack.components.embedders.sentence_transformers_text_embedder import (  # pyright: ignore[reportMissingImports]
                 SentenceTransformersTextEmbedder,
             )
         except ImportError as exc:
@@ -121,16 +121,16 @@ class HaystackEmbeddingsWrapper(BaseRagasEmbeddings):
 
     def __repr__(self) -> str:
         try:
-            from haystack.components.embedders.azure_text_embedder import (
+            from haystack.components.embedders.azure_text_embedder import (  # pyright: ignore[reportMissingImports]
                 AzureOpenAITextEmbedder,
             )
-            from haystack.components.embedders.hugging_face_api_text_embedder import (
+            from haystack.components.embedders.hugging_face_api_text_embedder import (  # pyright: ignore[reportMissingImports]
                 HuggingFaceAPITextEmbedder,
             )
-            from haystack.components.embedders.openai_text_embedder import (
+            from haystack.components.embedders.openai_text_embedder import (  # pyright: ignore[reportMissingImports]
                 OpenAITextEmbedder,
             )
-            from haystack.components.embedders.sentence_transformers_text_embedder import (
+            from haystack.components.embedders.sentence_transformers_text_embedder import (  # pyright: ignore[reportMissingImports]
                 SentenceTransformersTextEmbedder,
             )
         except ImportError:

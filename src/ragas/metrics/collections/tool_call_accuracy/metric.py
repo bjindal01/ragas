@@ -117,10 +117,12 @@ class ToolCallAccuracy(BaseMetric):
         if not pred_tool_calls and not reference_tool_calls:
             return MetricResult(value=1.0)
         elif not pred_tool_calls:
-            warnings.warn("No tool calls found in the user input")
+            warnings.warn("No tool calls found in the user input", stacklevel=2)
             return MetricResult(value=0.0)
         elif not reference_tool_calls:
-            warnings.warn("Reference tool calls are empty but predictions exist")
+            warnings.warn(
+                "Reference tool calls are empty but predictions exist", stacklevel=2
+            )
             return MetricResult(value=0.0)
 
         # Sort tool calls if not using strict order
@@ -136,7 +138,8 @@ class ToolCallAccuracy(BaseMetric):
                 f"Length mismatch: predicted tool calls ({len(pred_tool_calls)}) "
                 f"vs reference tool calls ({len(reference_tool_calls)}). "
                 f"Only the first {min(len(pred_tool_calls), len(reference_tool_calls))} "
-                f"tool calls will be compared."
+                f"tool calls will be compared.",
+                stacklevel=2,
             )
 
         # Extract sequences and check alignment

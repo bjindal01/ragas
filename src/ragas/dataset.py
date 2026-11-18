@@ -126,13 +126,13 @@ class DataTable(t.Generic[T]):
             registry = get_registry()
             try:
                 backend_class = registry[backend]
-            except KeyError:
+            except KeyError as exc:
                 available = list(registry.keys())
                 raise ValueError(
                     f"Backend '{backend}' not found. "
                     f"Available backends: {available}. "
                     f"Install a backend plugin or check the name."
-                )
+                ) from exc
 
             try:
                 return backend_class(**kwargs)
@@ -140,9 +140,11 @@ class DataTable(t.Generic[T]):
                 raise TypeError(
                     f"Failed to create {backend} backend: {e}. "
                     f"Check required arguments for {backend_class.__name__}."
-                )
+                ) from e
             except Exception as e:
-                raise RuntimeError(f"Failed to initialize {backend} backend: {e}")
+                raise RuntimeError(
+                    f"Failed to initialize {backend} backend: {e}"
+                ) from e
 
         # Validate backend type
         if not isinstance(backend, BaseBackend):
@@ -229,10 +231,10 @@ class DataTable(t.Generic[T]):
         """
         try:
             import pandas as pd
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "pandas is not installed. Please install it to use this function."
-            )
+            ) from e
 
         if not isinstance(dataframe, pd.DataFrame):
             raise TypeError(f"Expected pandas DataFrame, got {type(dataframe)}")
@@ -317,10 +319,10 @@ class DataTable(t.Generic[T]):
         """Convert the dataset to a pandas DataFrame."""
         try:
             import pandas as pd
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "pandas is not installed. Please install it to use this function."
-            )
+            ) from e
 
         # Convert data to list of dictionaries
         dict_data: t.List[t.Dict[str, t.Any]] = []

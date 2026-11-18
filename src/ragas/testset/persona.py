@@ -14,12 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 def default_filter(node: Node) -> bool:
-    if (
-        node.type.name == "DOCUMENT" or node.type.name == "CHUNK"
-    ) and node.properties.get("summary_embedding") is not None:
-        return True
-    else:
-        return False
+    return bool(
+        (node.type.name == "DOCUMENT" or node.type.name == "CHUNK")
+        and node.properties.get("summary_embedding") is not None
+    )
 
 
 class Persona(BaseModel):
@@ -58,13 +56,16 @@ class PersonaList(BaseModel):
         raise KeyError(f"No persona found with name '{key}'")
 
 
+_DEFAULT_PERSONA_GENERATION_PROMPT = PersonaGenerationPrompt()
+
+
 def generate_personas_from_kg(
     kg: KnowledgeGraph,
     llm: BaseRagasLLM,
-    persona_generation_prompt: PersonaGenerationPrompt = PersonaGenerationPrompt(),
+    persona_generation_prompt: PersonaGenerationPrompt = _DEFAULT_PERSONA_GENERATION_PROMPT,
     num_personas: int = 3,
     filter_fn: t.Callable[[Node], bool] = default_filter,
-    callbacks: Callbacks = [],
+    callbacks: Callbacks = None,
 ) -> t.List[Persona]:
     """
     Generate personas from a knowledge graph based on cluster of similar document summaries.
@@ -88,6 +89,8 @@ def generate_personas_from_kg(
         t.List[Persona]
             The list of generated personas.
     """
+    if callbacks is None:
+        callbacks = []
 
     nodes = [node for node in kg.nodes if filter_fn(node)]
     if len(nodes) == 0:

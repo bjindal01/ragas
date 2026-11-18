@@ -13,6 +13,10 @@ if t.TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# Shared default, so the seeded rng keeps advancing across calls like the
+# previous `run_config: RunConfig = RunConfig()` default did.
+_DEFAULT_RUN_CONFIG = RunConfig()
+
 Transforms = t.Union[
     t.List[t.Union[BaseGraphTransformation, "Parallel"]],
     "Parallel",
@@ -54,7 +58,7 @@ def get_desc(transform: BaseGraphTransformation | Parallel):
 def apply_transforms(
     kg: KnowledgeGraph,
     transforms: Transforms,
-    run_config: RunConfig = RunConfig(),
+    run_config: RunConfig = _DEFAULT_RUN_CONFIG,
     callbacks: t.Optional[Callbacks] = None,
 ):
     """

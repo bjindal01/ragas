@@ -175,9 +175,9 @@ class AnswerCorrectness(MetricWithLLM, MetricWithEmbeddings, SingleTurnMetric):
             raise ValueError(
                 "Expects a list of two weights. First for factuality, second for semantic similarity"
             )
-        if all([w == 0 for w in self.weights]):
+        if all(w == 0 for w in self.weights):
             raise ValueError("At least one weight must be non-zero")
-        if not all([w >= 0 for w in self.weights]):
+        if not all(w >= 0 for w in self.weights):
             raise ValueError("Weights must be non-negative")
 
         if type(self.beta) is not float:
@@ -233,9 +233,9 @@ class AnswerCorrectness(MetricWithLLM, MetricWithEmbeddings, SingleTurnMetric):
             statements_x = statements_x.statements
             statements[item] = statements_x
 
-        if not all([val == [] for val in statements.values()]):
-            ground_truth = [statement for statement in statements["reference"]]
-            answer = [statement for statement in statements["response"]]
+        if not all(val == [] for val in statements.values()):
+            ground_truth = list(statements["reference"])
+            answer = list(statements["response"])
             answers = await self.correctness_prompt.generate(
                 llm=self.llm,
                 data=QuestionAnswerGroundTruth(

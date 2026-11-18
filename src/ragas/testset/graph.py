@@ -273,7 +273,7 @@ class KnowledgeGraph:
 
         return next(filter(lambda n: n.id == node_id, self.nodes), None)
 
-    def find_indirect_clusters(
+    def find_indirect_clusters(  # noqa: C901
         self,
         relationship_condition: t.Callable[[Relationship], bool] = lambda _: True,
         depth_limit: int = 3,
@@ -468,7 +468,7 @@ class KnowledgeGraph:
 
         return [set(path_nodes) for path_nodes in cluster_sets]
 
-    def find_n_indirect_clusters(
+    def find_n_indirect_clusters(  # noqa: C901
         self,
         n: int,
         relationship_condition: t.Callable[[Relationship], bool] = lambda _: True,
@@ -564,7 +564,7 @@ class KnowledgeGraph:
             current_path.add(node)
             path_length = len(current_path)
             at_max_depth = path_length >= depth_limit
-            neighbors = adjacency_list.get(node, None)
+            neighbors = adjacency_list.get(node)
 
             # If this is a leaf node or we've reached depth limit
             # and we have a valid path of at least 2 nodes, add it as a cluster

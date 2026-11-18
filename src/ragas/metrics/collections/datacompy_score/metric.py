@@ -57,14 +57,16 @@ class DataCompyScore(BaseMetric):
 
             # Try new import path first (datacompy >= 0.14), fall back to legacy
             try:
-                from datacompy.core import Compare
+                from datacompy.core import (  # pyright: ignore[reportMissingImports]
+                    Compare,
+                )
             except ImportError:
                 from datacompy import Compare  # type: ignore[attr-defined]
         except ImportError as e:
             raise ImportError(
                 f"{e.name} is required for DataCompyScore. "
                 f"Please install it using `pip install {e.name}`"
-            )
+            ) from e
 
         self._pd = pd
         self._Compare = Compare

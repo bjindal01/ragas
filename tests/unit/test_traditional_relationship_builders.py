@@ -14,7 +14,7 @@ from ragas.testset.transforms.relationship_builders.traditional import (
 )
 
 
-def generate_test_sets(
+def generate_test_sets(  # noqa: C901
     n: int = 16,
     max_len: int = 32,
     min_similarity: float = 0.5,

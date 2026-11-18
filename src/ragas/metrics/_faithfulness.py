@@ -223,10 +223,10 @@ class FaithfulnesswithHHEM(Faithfulness):
     def __post_init__(self):
         try:
             from transformers import AutoModelForSequenceClassification  # type: ignore
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "Huggingface transformers must be installed to use this feature, try `pip install transformers`"
-            )
+            ) from e
         self.nli_classifier = AutoModelForSequenceClassification.from_pretrained(
             "vectara/hallucination_evaluation_model", trust_remote_code=True
         )

@@ -43,12 +43,11 @@ class BasePrompt(ABC):
         data: t.Any,
         temperature: t.Optional[float] = None,
         stop: t.Optional[t.List[str]] = None,
-        callbacks: Callbacks = [],
+        callbacks: Callbacks = None,
     ) -> t.Any:
         """
         Generate a single completion from the prompt.
         """
-        pass
 
     @abstractmethod
     def generate_multiple(
@@ -58,12 +57,11 @@ class BasePrompt(ABC):
         n: int = 1,
         temperature: t.Optional[float] = None,
         stop: t.Optional[t.List[str]] = None,
-        callbacks: Callbacks = [],
+        callbacks: Callbacks = None,
     ) -> t.Any:
         """
         Generate multiple completions from the prompt.
         """
-        pass
 
     def save(self, file_path: str):
         """
@@ -143,7 +141,7 @@ class StringPrompt(BasePrompt):
         data: str,
         temperature: t.Optional[float] = None,
         stop: t.Optional[t.List[str]] = None,
-        callbacks: Callbacks = [],
+        callbacks: Callbacks = None,
     ) -> str:
         """
         Generate text based on the instruction and provided data.
@@ -168,6 +166,8 @@ class StringPrompt(BasePrompt):
         str
             The generated text.
         """
+        if callbacks is None:
+            callbacks = []
         llm_result = await llm.agenerate_text(
             StringPromptValue(text=data),
             n=1,
@@ -184,7 +184,7 @@ class StringPrompt(BasePrompt):
         n: int = 1,
         temperature: t.Optional[float] = None,
         stop: t.Optional[t.List[str]] = None,
-        callbacks: Callbacks = [],
+        callbacks: Callbacks = None,
     ) -> t.List[str]:
         """
         Generate multiple distinct text outputs based on the instruction and provided data.
@@ -215,6 +215,8 @@ class StringPrompt(BasePrompt):
         - This ensures that multiple outputs for the same input are distinct.
         - Previous issues where caching returned duplicate outputs have been fixed.
         """
+        if callbacks is None:
+            callbacks = []
         llm_result = await llm.agenerate_text(
             StringPromptValue(text=data),
             n=n,

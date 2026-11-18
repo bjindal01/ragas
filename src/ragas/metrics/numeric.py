@@ -79,11 +79,11 @@ class NumericMetric(SimpleLLMMetric, NumericValidator):
         """
         try:
             from scipy.stats import pearsonr
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "scipy is required for correlation calculation. "
                 "Please install it with `pip install scipy`."
-            )
+            ) from e
         # Convert strings to floats for correlation calculation
         gold_floats = [float(x) for x in gold_labels]
         pred_floats = [float(x) for x in predictions]

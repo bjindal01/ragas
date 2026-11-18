@@ -15,12 +15,16 @@ from ragas.run_config import RunConfig
 
 if t.TYPE_CHECKING:
     from langchain_core.callbacks import Callbacks
-    from llama_index.core.base.embeddings.base import (
+    from llama_index.core.base.embeddings.base import (  # pyright: ignore[reportMissingImports]
         BaseEmbedding as LlamaIndexEmbeddings,
     )
-    from llama_index.core.base.llms.base import BaseLLM as LlamaindexLLM
-    from llama_index.core.base.response.schema import Response as LlamaIndexResponse
-    from llama_index.core.workflow import Event
+    from llama_index.core.base.llms.base import (  # pyright: ignore[reportMissingImports]
+        BaseLLM as LlamaindexLLM,
+    )
+    from llama_index.core.base.response.schema import (  # pyright: ignore[reportMissingImports]
+        Response as LlamaIndexResponse,
+    )
+    from llama_index.core.workflow import Event  # pyright: ignore[reportMissingImports]
 
     from ragas.cost import TokenUsageParser
 
@@ -139,16 +143,19 @@ def convert_to_ragas_messages(events: t.List[Event]) -> t.List[Message]:
         Tool calls are de-duplicated using their tool ID to avoid repeated entries.
     """
     try:
-        from llama_index.core.agent.workflow import (
+        from llama_index.core.agent.workflow import (  # pyright: ignore[reportMissingImports]
             AgentInput,
             AgentOutput,
             ToolCallResult,
         )
-        from llama_index.core.base.llms.types import MessageRole, TextBlock
-    except ImportError:
+        from llama_index.core.base.llms.types import (  # pyright: ignore[reportMissingImports]
+            MessageRole,
+            TextBlock,
+        )
+    except ImportError as e:
         raise ImportError(
             "Please install the llama_index package to use this function."
-        )
+        ) from e
     ragas_messages = []
     tool_call_ids = set()
 

@@ -64,7 +64,7 @@ def test_loader_batch():
     ]
     dataset = SingleMetricAnnotation(name="metric", samples=annotated_samples)
     batches = dataset.batch(batch_size=2)
-    assert all([len(item) == 2 for item in batches])
+    assert all(len(item) == 2 for item in batches)
 
     batches = dataset.stratified_batches(batch_size=2, stratify_key="metric_output")
     assert all(sum([item["metric_output"] for item in batch]) == 1 for batch in batches)
