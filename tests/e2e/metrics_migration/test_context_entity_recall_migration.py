@@ -220,7 +220,7 @@ class TestContextEntityRecallE2EMigration:
         # Test that invalid components are properly rejected
         try:
             ContextEntityRecall(llm=mock_llm)
-            assert False, "Should have rejected Mock LLM"
+            raise AssertionError("Should have rejected Mock LLM")
         except ValueError as e:
             assert "modern InstructorLLM" in str(e)
             print("✅ Correctly rejected invalid LLM component")

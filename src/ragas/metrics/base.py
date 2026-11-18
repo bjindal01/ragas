@@ -200,7 +200,7 @@ class MetricWithLLM(Metric, PromptMixin):
     ):
         if self.llm is None:
             raise ValueError(
-                f"Metric '{self.name}' has no valid LLM provided (self.llm is None). Please initantiate a the metric with an LLM to run."  # noqa
+                f"Metric '{self.name}' has no valid LLM provided (self.llm is None). Please initantiate a the metric with an LLM to run."
             )
         optimizer = instruction_config.optimizer
         if optimizer.llm is None:
@@ -382,7 +382,7 @@ class MetricWithEmbeddings(Metric):
     def init(self, run_config: RunConfig):
         if self.embeddings is None:
             raise ValueError(
-                f"Metric '{self.name}' has no valid embeddings provided (self.embeddings is None). Please initantiate a the metric with an embeddings to run."  # noqa
+                f"Metric '{self.name}' has no valid embeddings provided (self.embeddings is None). Please initantiate a the metric with an embeddings to run."
             )
         # Only legacy BaseRagasEmbeddings has set_run_config method
         if hasattr(self.embeddings, "set_run_config"):
@@ -670,7 +670,7 @@ class Ensember:
             item = inputs[0][i]
             verdicts = [inputs[k][i][attribute] for k in range(len(inputs))]
             verdict_counts = dict(Counter(verdicts).most_common())
-            item[attribute] = list(verdict_counts.keys())[0]
+            item[attribute] = next(iter(verdict_counts.keys()))
             verdict_agg.append(item)
 
         return verdict_agg
@@ -732,7 +732,6 @@ class SimpleBaseMetric(ABC):
         MetricResult
             The evaluation result containing the score and reasoning.
         """
-        pass
 
     @abstractmethod
     async def ascore(self, **kwargs) -> "MetricResult":
@@ -749,7 +748,6 @@ class SimpleBaseMetric(ABC):
         MetricResult
             The evaluation result containing the score and reasoning.
         """
-        pass
 
     def batch_score(
         self,
@@ -838,7 +836,7 @@ def create_auto_response_model(name: str, **fields) -> t.Type["BaseModel"]:
     from pydantic import create_model
 
     model = create_model(name, **fields)
-    setattr(model, "__ragas_auto_generated__", True)  # type: ignore[attr-defined]
+    model.__ragas_auto_generated__ = True  # type: ignore[attr-defined]
     return model
 
 
@@ -978,12 +976,15 @@ class SimpleLLMMetric(SimpleBaseMetric):
         # Collect warning messages for data loss
         warning_messages = []
 
-        if hasattr(self, "_response_model") and self._response_model:
-            # Only warn for custom response models, not auto-generated ones
-            if not getattr(self._response_model, "__ragas_auto_generated__", False):
-                warning_messages.append(
-                    "- Custom response_model will be lost (set it manually after loading)"
-                )
+        # Only warn for custom response models, not auto-generated ones
+        if (
+            hasattr(self, "_response_model")
+            and self._response_model
+            and not getattr(self._response_model, "__ragas_auto_generated__", False)
+        ):
+            warning_messages.append(
+                "- Custom response_model will be lost (set it manually after loading)"
+            )
 
         # Serialize the prompt (may add embedding_model warning)
         prompt_data = self._serialize_prompt(warning_messages)
@@ -999,7 +1000,8 @@ class SimpleLLMMetric(SimpleBaseMetric):
             warnings.warn(
                 "Some metric components cannot be saved and will be lost:\n"
                 + "\n".join(warning_messages)
-                + "\n\nYou'll need to provide these when loading the metric."
+                + "\n\nYou'll need to provide these when loading the metric.",
+                stacklevel=2,
             )
 
         data = {
@@ -1018,7 +1020,7 @@ class SimpleLLMMetric(SimpleBaseMetric):
                 with open(file_path, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=2)
         except (OSError, IOError) as e:
-            raise ValueError(f"Cannot save metric to {file_path}: {e}")
+            raise ValueError(f"Cannot save metric to {file_path}: {e}") from e
 
     def _serialize_prompt(self, warning_messages: t.List[str]) -> t.Dict[str, t.Any]:
         """Serialize the prompt for storage."""
@@ -1115,7 +1117,7 @@ class SimpleLLMMetric(SimpleBaseMetric):
                     data = json.load(f)
             return data
         except (FileNotFoundError, json.JSONDecodeError, OSError) as e:
-            raise ValueError(f"Cannot read metric type from {path}: {e}")
+            raise ValueError(f"Cannot read metric type from {path}: {e}") from e
 
     @classmethod
     def _validate_metric_type(cls, path: str) -> None:
@@ -1186,14 +1188,15 @@ class SimpleLLMMetric(SimpleBaseMetric):
                 with open(file_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError, OSError) as e:
-            raise ValueError(f"Cannot load metric from {path}: {e}")
+            raise ValueError(f"Cannot load metric from {path}: {e}") from e
 
         # Validate format
         if data.get("format_version") != "1.0":
             import warnings
 
             warnings.warn(
-                f"Loading metric with format version {data.get('format_version')}, expected 1.0"
+                f"Loading metric with format version {data.get('format_version')}, expected 1.0",
+                stacklevel=2,
             )
 
         # Reconstruct the prompt
@@ -1249,7 +1252,8 @@ class SimpleLLMMetric(SimpleBaseMetric):
 
                 warnings.warn(
                     "DynamicFewShotPrompt was saved with an embedding model but none provided. "
-                    "Similarity-based example selection will not work."
+                    "Similarity-based example selection will not work.",
+                    stacklevel=2,
                 )
 
             # Create base prompt first
@@ -1280,7 +1284,6 @@ class SimpleLLMMetric(SimpleBaseMetric):
         Calculate the correlation between gold scores and predicted scores.
         This is a placeholder method and should be implemented based on the specific metric.
         """
-        pass
 
     def align_and_validate(
         self,
@@ -1396,7 +1399,7 @@ class SimpleLLMMetric(SimpleBaseMetric):
         self,
         llm: "BaseRagasLLM",
         test_dataset: "Dataset",
-        mapping: t.Dict[str, str] = {},
+        mapping: t.Optional[t.Dict[str, str]] = None,
     ):
         """
         Args:
@@ -1409,6 +1412,8 @@ class SimpleLLMMetric(SimpleBaseMetric):
         the predicted scores from the metric.
         """
 
+        if mapping is None:
+            mapping = {}
         test_dataset.reload()
         gold_scores_raw = [
             test_dataset.get_row_value(row, self.name) for row in test_dataset
@@ -1454,7 +1459,7 @@ class SimpleLLMMetric(SimpleBaseMetric):
         elif isinstance(allowed_values, (list, tuple, int)):
             allowed_values_str = f", allowed_values={allowed_values}"
         else:
-            allowed_values_str = f", allowed_values={repr(allowed_values)}"
+            allowed_values_str = f", allowed_values={allowed_values!r}"
 
         prompt_str = ""
         if self.prompt:

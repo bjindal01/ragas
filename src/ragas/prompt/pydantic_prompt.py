@@ -535,7 +535,7 @@ class RagasOutputParser(PydanticOutputParser[OutputModel]):
         try:
             jsonstr = extract_json(output_string)
             result = super().parse(jsonstr)
-        except OutputParserException:
+        except OutputParserException as e:
             if retries_left != 0:
                 retry_rm, retry_cb = new_group(
                     name="fix_output_format",
@@ -554,7 +554,7 @@ class RagasOutputParser(PydanticOutputParser[OutputModel]):
                 retry_rm.on_chain_end({"fixed_output_string": fixed_output_string})
                 result = super().parse(fixed_output_string.text)
             else:
-                raise RagasOutputParserException()
+                raise RagasOutputParserException() from e
         return result
 
 

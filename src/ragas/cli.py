@@ -3,6 +3,7 @@ Ragas CLI for running experiments from command line.
 """
 
 import asyncio
+import contextlib
 import importlib.util
 import sys
 import traceback
@@ -27,7 +28,6 @@ app = typer.Typer(help="Ragas CLI for running LLM evaluations")
 @app.callback()
 def main():
     """Ragas CLI for running LLM evaluations"""
-    pass
 
 
 # Rich utility functions
@@ -280,7 +280,7 @@ async def run_experiments(
         success(f"✓ Loaded dataset with {len(dataset)} rows")
     except Exception as e:
         error(f"Error loading dataset '{dataset_name}': {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     # Run the experiment using the run_async method
     try:
@@ -288,7 +288,7 @@ async def run_experiments(
         success("✓ Completed experiments successfully")
     except Exception as e:
         error(f"Error running experiments: {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     # Parse metrics from provided list
     metric_fields = [
@@ -454,11 +454,11 @@ def evals(
     except Exception as e:
         error(f"Error running evaluation: {e}")
         traceback.print_exc()
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
 
 @app.command()
-def quickstart(
+def quickstart(  # noqa: C901
     template: Optional[str] = typer.Argument(
         None,
         help="Template name (e.g., 'rag_eval', 'agent_evals'). Leave empty to see available templates.",
@@ -641,7 +641,7 @@ def quickstart(
             console.print(
                 f"  cp -r ragas/examples/ragas_examples/{template_path} ./{template}"
             )
-            raise typer.Exit(1)
+            raise typer.Exit(1) from e
 
     # Determine output directory
     output_path = Path(output_dir) / template
@@ -880,10 +880,8 @@ Visit https://docs.ragas.io for more information.
 
     # Cleanup temporary directory if we downloaded from GitHub
     if temp_dir is not None:
-        try:
+        with contextlib.suppress(Exception):
             shutil.rmtree(temp_dir)
-        except Exception:
-            pass
 
     # Success message with next steps
     success(f"\n✓ Created {template_info['name']} project at: {output_path}")

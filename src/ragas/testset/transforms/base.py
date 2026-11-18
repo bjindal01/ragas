@@ -62,7 +62,6 @@ class BaseGraphTransformation(ABC):
         t.Any
             The transformed knowledge graph.
         """
-        pass
 
     def filter(self, kg: KnowledgeGraph) -> KnowledgeGraph:
         """
@@ -114,7 +113,6 @@ class BaseGraphTransformation(ABC):
         t.Sequence[t.Coroutine]
             A sequence of coroutines to be executed in parallel.
         """
-        pass
 
 
 @dataclass
@@ -177,7 +175,6 @@ class Extractor(BaseGraphTransformation):
         t.Tuple[str, t.Any]
             A tuple containing the property name and the extracted value.
         """
-        pass
 
     def generate_execution_plan(self, kg: KnowledgeGraph) -> t.Sequence[t.Coroutine]:
         """
@@ -289,7 +286,6 @@ class Splitter(BaseGraphTransformation):
         t.Tuple[t.List[Node], t.List[Relationship]]
             A tuple containing a list of new nodes and a list of new relationships.
         """
-        pass
 
     def generate_execution_plan(self, kg: KnowledgeGraph) -> t.Sequence[t.Coroutine]:
         """
@@ -346,7 +342,6 @@ class RelationshipBuilder(BaseGraphTransformation):
         t.List[Relationship]
             A list of new relationships.
         """
-        pass
 
     def generate_execution_plan(self, kg: KnowledgeGraph) -> t.Sequence[t.Coroutine]:
         """
@@ -409,7 +404,6 @@ class NodeFilter(BaseGraphTransformation):
         bool
             A boolean indicating whether the node should be filtered.
         """
-        pass
 
     def generate_execution_plan(self, kg: KnowledgeGraph) -> t.Sequence[t.Coroutine]:
         """

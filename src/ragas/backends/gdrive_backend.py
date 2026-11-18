@@ -164,11 +164,11 @@ class GDriveBackend(BaseBackend):
             if e.resp.status == 404:  # type: ignore
                 raise ValueError(
                     f"Folder with ID {self.folder_id} not found or not accessible"
-                )
+                ) from e
             else:
                 raise ValueError(
                     f"Failed to access folder with ID {self.folder_id}: {e}"
-                )
+                ) from e
 
         # Create datasets and experiments folders if they don't exist
         self.datasets_folder_id = self._get_or_create_folder("datasets", self.folder_id)
@@ -333,7 +333,7 @@ class GDriveBackend(BaseBackend):
         all_keys = set()
         for item in data:
             all_keys.update(item.keys())
-        headers = sorted(list(all_keys))
+        headers = sorted(all_keys)
 
         # Prepare data for the sheet
         sheet_data = [headers]  # First row is headers

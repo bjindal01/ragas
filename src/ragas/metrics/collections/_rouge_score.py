@@ -71,11 +71,11 @@ class RougeScore(BaseMetric):
         # Import and check dependencies
         try:
             from rouge_score import rouge_scorer
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "rouge_score is required for ROUGE score calculation. "
                 "Please install it using `pip install rouge_score`"
-            )
+            ) from e
 
         # Calculate ROUGE score
         scorer = rouge_scorer.RougeScorer([self.rouge_type], use_stemmer=True)

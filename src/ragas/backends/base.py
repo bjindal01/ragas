@@ -61,7 +61,6 @@ class BaseBackend(ABC):
             - Each dict represents one data row/item
             - Preserve data types where possible (JSONL) or document limitations (CSV)
         """
-        pass
 
     @abstractmethod
     def load_experiment(self, name: str) -> t.List[t.Dict[str, t.Any]]:
@@ -80,7 +79,6 @@ class BaseBackend(ABC):
             - Identical interface to load_dataset but separate storage
             - Return empty list [] for empty experiments, never None
         """
-        pass
 
     @abstractmethod
     def save_dataset(
@@ -102,7 +100,6 @@ class BaseBackend(ABC):
             - Handle empty data list gracefully
             - data_model is for context only; data is always pre-validated dicts
         """
-        pass
 
     @abstractmethod
     def save_experiment(
@@ -122,7 +119,6 @@ class BaseBackend(ABC):
             - Identical interface to save_dataset but separate storage
             - Overwrite existing experiment with same name
         """
-        pass
 
     @abstractmethod
     def list_datasets(self) -> t.List[str]:
@@ -136,7 +132,6 @@ class BaseBackend(ABC):
             - Sort alphabetically for consistent ordering
             - Return just the names, not full paths or metadata
         """
-        pass
 
     @abstractmethod
     def list_experiments(self) -> t.List[str]:
@@ -149,4 +144,3 @@ class BaseBackend(ABC):
             - Identical interface to list_datasets but for experiments
             - Return empty list if no experiments exist
         """
-        pass

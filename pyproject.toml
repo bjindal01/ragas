@@ -104,8 +104,40 @@ target-version = "py39"
 exclude = ["*.ipynb", "*/_version.py"]  # Exclude Jupyter notebooks and auto-generated version files from linting
 
 [tool.ruff.lint]
-select = ["E", "F", "I"]
-ignore = ["E501"]  # Line length handled by formatter
+select = [
+    "E",       # pycodestyle errors
+    "F",       # pyflakes
+    "I",       # isort
+    "B",       # flake8-bugbear: likely bugs and design problems
+    "C4",      # flake8-comprehensions
+    "C90",     # mccabe complexity (threshold below)
+    "SIM",     # flake8-simplify
+    "PIE",     # flake8-pie: unnecessary pass/ellipsis, duplicate keys
+    "RUF",     # ruff-specific rules (exceptions listed below)
+    "T10",     # leftover debugger calls
+    "PGH004",  # blanket `# noqa` without a rule code
+]
+# pyupgrade (UP) is deliberately not enabled: the project supports Python 3.9,
+# where `X | None` and builtin generics in runtime-evaluated annotations fail.
+ignore = [
+    "E501",    # line length is handled by the formatter
+    "SIM108",  # ternaries are not always clearer than an if/else block
+    "SIM117",  # Python 3.9 has no parenthesized context managers, so merged
+               # `with` statements cannot be wrapped by the formatter
+    "RUF001",  # ambiguous unicode in strings: prompts and docs use real
+    "RUF002",  #   typography (curly quotes, dashes, non-breaking hyphens)
+    "RUF003",  #   on purpose
+    "RUF009",  # prompts are dataclass field defaults built at class creation;
+               # moving them to default_factory would change instance sharing
+    "RUF012",  # flags pydantic fields and per-subclass prompt `examples`;
+               # ClassVar would remove them from the pydantic models
+    "RUF022",  # `__all__` lists are grouped by topic, not sorted
+]
+
+[tool.ruff.lint.mccabe]
+# Functions above this are refactor candidates. The few existing ones that
+# exceed it carry a `# noqa: C901` so new complexity is caught in review.
+max-complexity = 15
 
 [tool.ruff.lint.isort]
 # Import sorting configuration

@@ -64,7 +64,7 @@ class DataCompyScore(BaseMetric):
             raise ImportError(
                 f"{e.name} is required for DataCompyScore. "
                 f"Please install it using `pip install {e.name}`"
-            )
+            ) from e
 
         self._pd = pd
         self._Compare = Compare

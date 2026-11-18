@@ -81,11 +81,11 @@ class DiscreteMetric(SimpleLLMMetric, DiscreteValidator):
         """
         try:
             from sklearn.metrics import cohen_kappa_score
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "scikit-learn is required for correlation calculation. "
                 "Please install it with `pip install scikit-learn`."
-            )
+            ) from e
         return cohen_kappa_score(gold_labels, predictions)
 
     @classmethod

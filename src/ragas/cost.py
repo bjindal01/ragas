@@ -50,12 +50,9 @@ class TokenUsage(BaseModel):
         )
 
     def is_same_model(self, other: "TokenUsage") -> bool:
-        if self.model is None and other.model is None:
-            return True
-        elif self.model == other.model:
-            return True
-        else:
-            return False
+        return bool(
+            (self.model is None and other.model is None) or self.model == other.model
+        )
 
 
 def get_token_usage_for_openai(
@@ -81,26 +78,23 @@ def get_token_usage_for_anthropic(
     token_usages = []
     for gs in llm_result.generations:
         for g in gs:
-            if isinstance(g, ChatGeneration):
-                if g.message.response_metadata != {}:
-                    # Anthropic
-                    token_usages.append(
-                        TokenUsage(
-                            input_tokens=get_from_dict(
-                                g.message.response_metadata,
-                                "usage.input_tokens",
-                                0,
-                            ),
-                            output_tokens=get_from_dict(
-                                g.message.response_metadata,
-                                "usage.output_tokens",
-                                0,
-                            ),
-                            model=get_from_dict(
-                                g.message.response_metadata, "model", ""
-                            ),
-                        )
+            if isinstance(g, ChatGeneration) and g.message.response_metadata != {}:
+                # Anthropic
+                token_usages.append(
+                    TokenUsage(
+                        input_tokens=get_from_dict(
+                            g.message.response_metadata,
+                            "usage.input_tokens",
+                            0,
+                        ),
+                        output_tokens=get_from_dict(
+                            g.message.response_metadata,
+                            "usage.output_tokens",
+                            0,
+                        ),
+                        model=get_from_dict(g.message.response_metadata, "model", ""),
                     )
+                )
         model = next((usage.model for usage in token_usages if usage.model), "")
         return sum(
             token_usages, TokenUsage(input_tokens=0, output_tokens=0, model=model)
@@ -115,25 +109,24 @@ def get_token_usage_for_bedrock(
     token_usages = []
     for gs in llm_result.generations:
         for g in gs:
-            if isinstance(g, ChatGeneration):
-                if g.message.response_metadata != {}:
-                    token_usages.append(
-                        TokenUsage(
-                            input_tokens=get_from_dict(
-                                g.message.response_metadata,
-                                "usage.prompt_tokens",
-                                0,
-                            ),
-                            output_tokens=get_from_dict(
-                                g.message.response_metadata,
-                                "usage.completion_tokens",
-                                0,
-                            ),
-                            model=get_from_dict(
-                                g.message.response_metadata, "model_id", ""
-                            ),
-                        )
+            if isinstance(g, ChatGeneration) and g.message.response_metadata != {}:
+                token_usages.append(
+                    TokenUsage(
+                        input_tokens=get_from_dict(
+                            g.message.response_metadata,
+                            "usage.prompt_tokens",
+                            0,
+                        ),
+                        output_tokens=get_from_dict(
+                            g.message.response_metadata,
+                            "usage.completion_tokens",
+                            0,
+                        ),
+                        model=get_from_dict(
+                            g.message.response_metadata, "model_id", ""
+                        ),
                     )
+                )
         model = next((usage.model for usage in token_usages if usage.model), "")
         return sum(
             token_usages, TokenUsage(input_tokens=0, output_tokens=0, model=model)
@@ -170,8 +163,10 @@ class CostCallbackHandler(BaseCallbackHandler):
         self,
         cost_per_input_token: t.Optional[float] = None,
         cost_per_output_token: t.Optional[float] = None,
-        per_model_costs: t.Dict[str, t.Tuple[float, float]] = {},
+        per_model_costs: t.Optional[t.Dict[str, t.Tuple[float, float]]] = None,
     ) -> float:
+        if per_model_costs is None:
+            per_model_costs = {}
         if (
             per_model_costs == {}
             and cost_per_input_token is None
@@ -193,7 +188,7 @@ class CostCallbackHandler(BaseCallbackHandler):
         # caculate total cost
         # if only one model is used
         if len(total_table) == 1:
-            model_name = list(total_table)[0]
+            model_name = next(iter(total_table))
             # if per model cost is provided check that
             if per_model_costs != {}:
                 if model_name not in per_model_costs:
@@ -229,6 +224,6 @@ class CostCallbackHandler(BaseCallbackHandler):
                 total_table[usage.model] = usage
 
         if len(total_table) == 1:
-            return list(total_table.values())[0]
+            return next(iter(total_table.values()))
         else:
             return list(total_table.values())

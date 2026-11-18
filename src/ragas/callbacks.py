@@ -159,7 +159,7 @@ def parse_run_traces(
             )
             # get all the prompt IO from the metric trace
             prompt_traces = {}
-            for i, prompt_uuid in enumerate(metric_trace.children):
+            for prompt_uuid in metric_trace.children:
                 prompt_trace = traces[prompt_uuid]
                 output = prompt_trace.outputs.get("output", {})
                 output = output[0] if isinstance(output, list) else output

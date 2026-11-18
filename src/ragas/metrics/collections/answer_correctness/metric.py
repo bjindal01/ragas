@@ -80,7 +80,7 @@ class AnswerCorrectness(BaseMetric):
         llm: "InstructorBaseRagasLLM",
         embeddings: t.Optional["BaseRagasEmbedding"] = None,
         name: str = "answer_correctness",
-        weights: List[float] = [0.75, 0.25],
+        weights: t.Optional[List[float]] = None,
         beta: float = 1.0,
         **kwargs,
     ):
@@ -93,6 +93,7 @@ class AnswerCorrectness(BaseMetric):
                        weight is 0 (pure factuality evaluation). Required if similarity weight > 0.
             name: The metric name
             weights: [factuality_weight, similarity_weight]. Must sum to > 0.
+                Defaults to [0.75, 0.25].
             beta: F-beta score parameter. β>1 favors recall, β<1 favors precision.
 
         Raises:
@@ -105,6 +106,9 @@ class AnswerCorrectness(BaseMetric):
             Factuality + Similarity (embeddings required):
                 >>> metric = AnswerCorrectness(llm=llm, embeddings=embeddings, weights=[0.75, 0.25])
         """
+        if weights is None:
+            weights = [0.75, 0.25]
+
         # Set attributes explicitly before calling super()
         self.llm = llm
         self.embeddings = embeddings
@@ -118,9 +122,9 @@ class AnswerCorrectness(BaseMetric):
             raise ValueError(
                 "Expects a list of two weights. First for factuality, second for semantic similarity"
             )
-        if all([w == 0 for w in weights]):
+        if all(w == 0 for w in weights):
             raise ValueError("At least one weight must be non-zero")
-        if not all([w >= 0 for w in weights]):
+        if not all(w >= 0 for w in weights):
             raise ValueError("Weights must be non-negative")
 
         # Validate embeddings availability when similarity weight > 0
@@ -149,7 +153,6 @@ class AnswerCorrectness(BaseMetric):
         """
         # Only validate embeddings if similarity weight > 0
         # (validation logic already in __init__)
-        pass
 
     async def ascore(
         self, user_input: str, response: str, reference: str

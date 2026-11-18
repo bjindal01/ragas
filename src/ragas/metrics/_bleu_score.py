@@ -19,10 +19,10 @@ class BleuScore(SingleTurnMetric):
     def __post_init__(self):
         try:
             from sacrebleu import corpus_bleu
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "sacrebleu is required for bleu score. Please install it using `pip install sacrebleu`"
-            )
+            ) from e
         self.corpus_bleu = corpus_bleu
 
     def init(self, run_config: RunConfig):

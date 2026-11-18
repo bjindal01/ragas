@@ -43,7 +43,7 @@ class HeliconeSingleton:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def default_headers(self) -> Dict[str, Any]:
+    def default_headers(self) -> Dict[str, Any]:  # noqa: C901
         headers = {"Helicone-Auth": f"Bearer {self.api_key}"}
 
         if self.target_url:
@@ -78,7 +78,7 @@ class HeliconeSingleton:
             "Helicone-Omit-Response": self.omit_response,
             "Helicone-Omit-Request": self.omit_request,
             "Helicone-Cache-Enabled": (self.cache_enabled and "true")
-            or (self.cache_config.maxsize or self.cache_config.ttl and "true"),  # type: ignore
+            or (self.cache_config.maxsize or (self.cache_config.ttl and "true")),  # type: ignore
             "Helicone-Retry-Enabled": self.retry_enabled,
             "Helicone-Moderations-Enabled": self.moderations_enabled,
             "Helicone-LLM-Security-Enabled": self.llm_security_enabled,

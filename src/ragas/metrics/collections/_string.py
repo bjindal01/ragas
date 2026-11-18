@@ -171,11 +171,11 @@ class NonLLMStringSimilarity(BaseMetric):
 
         try:
             from rapidfuzz import distance
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "rapidfuzz is required for string distance. "
                 "Please install it using `pip install rapidfuzz`"
-            )
+            ) from e
 
         self.distance_measure_map = {
             DistanceMeasure.LEVENSHTEIN: distance.Levenshtein,

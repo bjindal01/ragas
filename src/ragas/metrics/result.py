@@ -27,9 +27,7 @@ class MetricResult:
         traces: t.Optional[t.Dict[str, t.Any]] = None,
     ):
         if traces is not None:
-            invalid_keys = [
-                key for key in traces.keys() if key not in {"input", "output"}
-            ]
+            invalid_keys = [key for key in traces if key not in {"input", "output"}]
             if invalid_keys:
                 raise ValueError(
                     f"Invalid keys in traces: {invalid_keys}. Allowed keys are 'input' and 'output'."

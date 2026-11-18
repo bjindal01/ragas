@@ -606,7 +606,7 @@ class TestInMemoryBackendIntegration:
         assert len(combined_data) == len(simple_data)
         for original_item in simple_data:
             assert original_item in combined_data
-        assert len(combined_data) == len(set(str(item) for item in combined_data))
+        assert len(combined_data) == len({str(item) for item in combined_data})
         assert isinstance(train_dataset.backend, InMemoryBackend)
         assert isinstance(test_dataset.backend, InMemoryBackend)
 
@@ -704,7 +704,7 @@ class TestInMemoryBackendIsolation:
                 backend.save_dataset(dataset_name, data)
                 results.append(f"success_{dataset_name}")
             except Exception as e:
-                results.append(f"error_{dataset_name}_{str(e)}")
+                results.append(f"error_{dataset_name}_{e!s}")
 
         # Create multiple threads to save different datasets concurrently
         threads = []
@@ -754,11 +754,11 @@ class TestInMemoryBackendIsolation:
                 data = backend.load_dataset("shared_dataset")
                 results.append(data)
             except Exception as e:
-                results.append(f"error_{str(e)}")
+                results.append(f"error_{e!s}")
 
         # Create multiple threads to read the same dataset concurrently
         threads = []
-        for i in range(10):
+        for _ in range(10):
             thread = threading.Thread(target=read_dataset)
             threads.append(thread)
 
@@ -801,20 +801,20 @@ class TestInMemoryBackendIsolation:
                 data = backend.load_dataset("mixed_dataset")
                 results.append(f"read_success_{len(data)}")
             except Exception as e:
-                results.append(f"read_error_{str(e)}")
+                results.append(f"read_error_{e!s}")
 
         def write_operation(dataset_name, data):
             try:
                 backend.save_dataset(dataset_name, data)
                 results.append(f"write_success_{dataset_name}")
             except Exception as e:
-                results.append(f"write_error_{dataset_name}_{str(e)}")
+                results.append(f"write_error_{dataset_name}_{e!s}")
 
         # Create mixed read and write threads
         threads = []
 
         # Add read threads
-        for i in range(3):
+        for _ in range(3):
             thread = threading.Thread(target=read_operation)
             threads.append(thread)
 

@@ -62,11 +62,11 @@ class BleuScore(BaseMetric):
         """
         try:
             from sacrebleu import corpus_bleu
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "sacrebleu is required for BLEU score calculation. "
                 "Please install it using `pip install sacrebleu`"
-            )
+            ) from e
 
         assert isinstance(reference, str), "BleuScore expects a valid reference string"
         assert isinstance(response, str), "BleuScore expects a valid response string"

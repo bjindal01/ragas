@@ -48,13 +48,15 @@ class BaseMigrationTest:
             additional_info_keys: Keys from data dict to display in test output
         """
         # Check if required components are available
-        if legacy_components:
-            if any(component is None for component in legacy_components.values()):
-                pytest.skip("Required components not available for E2E testing")
+        if legacy_components and any(
+            component is None for component in legacy_components.values()
+        ):
+            pytest.skip("Required components not available for E2E testing")
 
-        if v2_components:
-            if any(component is None for component in v2_components.values()):
-                pytest.skip("Required components not available for E2E testing")
+        if v2_components and any(
+            component is None for component in v2_components.values()
+        ):
+            pytest.skip("Required components not available for E2E testing")
 
         # Create metric instances
         legacy_metric = (
@@ -129,13 +131,15 @@ class BaseMigrationTest:
             assertion_fn: Optional custom assertion function that takes (case, legacy_score, v2_result)
         """
         # Check if required components are available
-        if legacy_components:
-            if any(component is None for component in legacy_components.values()):
-                pytest.skip("Required components not available for testing")
+        if legacy_components and any(
+            component is None for component in legacy_components.values()
+        ):
+            pytest.skip("Required components not available for testing")
 
-        if v2_components:
-            if any(component is None for component in v2_components.values()):
-                pytest.skip("Required components not available for testing")
+        if v2_components and any(
+            component is None for component in v2_components.values()
+        ):
+            pytest.skip("Required components not available for testing")
 
         # Create metric instances
         legacy_metric = (

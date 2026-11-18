@@ -145,10 +145,10 @@ def convert_to_ragas_messages(events: t.List[Event]) -> t.List[Message]:
             ToolCallResult,
         )
         from llama_index.core.base.llms.types import MessageRole, TextBlock
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             "Please install the llama_index package to use this function."
-        )
+        ) from e
     ragas_messages = []
     tool_call_ids = set()
 

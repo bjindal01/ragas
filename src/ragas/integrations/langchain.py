@@ -156,7 +156,7 @@ class EvaluatorChain(Chain, RunEvaluator):
         if "question" not in example.inputs or "ground_truth" not in example.outputs:
             raise ValueError(
                 "Expected 'question' and 'ground_truth' in example."
-                f"Got: {[k for k in example.inputs.keys()]}"
+                f"Got: {list(example.inputs.keys())}"
             )
         assert run.outputs is not None, (
             "the current run has no outputs. The chain should output 'answer' and 'contexts' keys."
@@ -169,7 +169,7 @@ class EvaluatorChain(Chain, RunEvaluator):
         if missing_keys:
             raise ValueError(
                 "Expected 'answer' and 'contexts' in run.outputs."
-                f"Got: {[k for k in run.outputs.keys()]}"
+                f"Got: {list(run.outputs.keys())}"
             )
 
     @t.no_type_check

@@ -19,10 +19,10 @@ class ChrfScore(SingleTurnMetric):
     def __post_init__(self):
         try:
             from sacrebleu import corpus_chrf
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "sacrebleu is required for chrf score. Please install it using `pip install sacrebleu`"
-            )
+            ) from e
         self.corpus_chrf = corpus_chrf
 
     def init(self, run_config: RunConfig):

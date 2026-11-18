@@ -58,7 +58,6 @@ class BaseRagasEmbedding(ABC):
         Returns:
             List of floats representing the embedding
         """
-        pass
 
     @abstractmethod
     async def aembed_text(self, text: str, **kwargs: t.Any) -> t.List[float]:
@@ -71,7 +70,6 @@ class BaseRagasEmbedding(ABC):
         Returns:
             List of floats representing the embedding
         """
-        pass
 
     def embed_texts(self, texts: t.List[str], **kwargs: t.Any) -> t.List[t.List[float]]:
         """Embed multiple texts.
@@ -377,10 +375,10 @@ class LangchainEmbeddingsWrapper(BaseRagasEmbeddings):
         if isinstance(self.embeddings, OpenAIEmbeddings):
             try:
                 from openai import RateLimitError
-            except ImportError:
+            except ImportError as e:
                 raise ImportError(
                     "openai.error.RateLimitError not found. Please install openai package as `pip install openai`"
-                )
+                ) from e
             self.embeddings.request_timeout = run_config.timeout
             self.run_config.exception_types = RateLimitError
 

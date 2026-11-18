@@ -29,7 +29,8 @@ class RelevanceInput(BaseModel):
             f"Question: {self.user_input}",
             f"Response: {self.response}",
             "retrieved_contexts: ",
-        ] + self.retrieved_contexts
+            *self.retrieved_contexts,
+        ]
 
 
 class RelevanceOutput(BaseModel):

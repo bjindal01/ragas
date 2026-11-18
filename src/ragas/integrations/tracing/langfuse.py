@@ -136,7 +136,7 @@ async def sync_trace(
             )
             return LangfuseTrace(trace=trace)
         except Exception as e:
-            logger.debug(f"Trace {trace_id} not yet synced: {str(e)}")
+            logger.debug(f"Trace {trace_id} not yet synced: {e!s}")
 
         await asyncio.sleep(delay)
 
