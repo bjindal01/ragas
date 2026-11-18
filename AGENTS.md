@@ -47,9 +47,9 @@ Run everything from the repo root. Use `uv run` for any Python tool (pytest, ruf
 | All static checks | `make lint` | ruff format check, ruff lint, pyright, and the pre-commit file checks (large files, merge markers, JSON/TOML/YAML, debugger calls, private keys). This is what CI runs. |
 | Auto-format and fix | `make format` | Rewrites files (ruff format, then `ruff check --fix-only`). |
 | Type check only | `make type` | pyright on `src`; must report 0 errors. |
-| Unit tests | `RAGAS_DO_NOT_TRACK=true __RAGAS_DEBUG_TRACKING=true uv run pytest tests/unit -n auto --dist loadfile` | ~20 s. On Python 3.12: 1353 passed, 49 skipped, 1 xfailed. |
+| Unit tests | `RAGAS_DO_NOT_TRACK=true __RAGAS_DEBUG_TRACKING=true uv run pytest tests/unit -n auto --dist loadfile` | ~20 s. Must finish with no failures; some skips are expected (see "Tests and API keys"). |
 | One file / one test | `RAGAS_DO_NOT_TRACK=true uv run pytest tests/unit/test_cache.py` or `... -k test_name` | `make test k=test_name` also works. |
-| Unit tests + coverage | `make test-cov` | Fails below `fail_under = 70` (`[tool.coverage.report]` in `pyproject.toml`); currently ~71% on 3.12. Writes `coverage.xml`. |
+| Unit tests + coverage | `make test-cov` | Fails below `fail_under = 70` (`[tool.coverage.report]` in `pyproject.toml`). Writes `coverage.xml`. |
 | Full local CI | `make run-ci` | `make lint`, then unit tests with `--nbmake` and `--cov` (the coverage floor applies). Run before opening a PR. |
 | Package build smoke | `make package-smoke` | Builds sdist and wheel, runs `twine check`, installs the wheel in a clean venv, imports it and runs `ragas --help`. |
 | Build only | `uv build` | Writes `dist/`. |
@@ -74,7 +74,7 @@ Run everything from the repo root. Use `uv run` for any Python tool (pytest, ruf
 
 - Unit tests must not call real LLM or embedding providers. Use the fixtures in `tests/conftest.py` (`EchoLLM`/`fake_llm`, `EchoEmbedding`/`fake_embedding`, `mock_llm`, `mock_embedding`) or `unittest.mock`.
 - Coverage is enforced: CI runs the 3.12 Ubuntu job with `--cov`, and `make run-ci` does too. New code needs tests that keep total coverage at or above 70%.
-- About 49 unit tests skip on Python 3.12, by design:
+- Some unit tests skip by design, depending on the Python version:
   - `dspy-ai`, `uvloop` and `datacompy` are not in `dev-minimal`.
   - A few tests are marked skip in the code: CSV backend limits, a flaky analytics test, and a TODO.
   - The `langchain`/`langsmith` integration tests need langchain 0.x, which only resolves on Python 3.9.
@@ -83,7 +83,7 @@ Run everything from the repo root. Use `uv run` for any Python tool (pytest, ruf
   - `__RAGAS_DEBUG_TRACKING=true` logs telemetry payloads instead of sending them (developer debugging).
   - `RAGAS_CACHE_HOME` optionally overrides the cache directory.
 - `tests/e2e` and `tests/benchmarks` need `OPENAI_API_KEY` and the full `dev` env (`make install`). With only `install-minimal`, e2e tests fail on missing packages such as `rouge_score`.
-- E2E tests that need a key skip when it is unset, except `tests/e2e/metrics_migration/metric_score_diff.ipynb`, which fails. Without a key, `make test-e2e` reports 39 passed, 48 skipped and 1 failed.
+- E2E tests that need a key skip when it is unset, except `tests/e2e/metrics_migration/metric_score_diff.ipynb`, which fails. So without a key, expect exactly that one failure from `make test-e2e`.
 - CI never runs e2e tests, so do not depend on them for validation. Never commit keys (`.env` is gitignored).
 - `tests/docs/` is outside `tests/unit`, so CI does not run it.
 - New tests go in `tests/unit/` and follow the `test_*.py` / `test_*` naming. Async tests use `@pytest.mark.asyncio`.
