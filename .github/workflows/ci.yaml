@@ -35,6 +35,7 @@ jobs:
           filters: |
             related: &related
               - .github/workflows/ci.yaml
+              - .pre-commit-config.yaml
               - codecov.yml
               - pyproject.toml
               - Makefile
@@ -180,17 +181,8 @@ jobs:
           # This uses make install-minimal for consistency with local development
           make install-minimal
 
-      - name: Format check (dry run)
-        run: |
-          # Check if code is properly formatted (without making changes)
-          # Note: We use direct commands here instead of the standalone Makefiles
-          # to have precise control over CI-specific options like --check for dry-run
-          echo "Checking ragas formatting..."
-          uv run ruff format --check src tests docs --exclude src/ragas/_version.py --config pyproject.toml
-          uv run ruff check src docs tests --exclude src/ragas/_version.py --config pyproject.toml
-
-      - name: Type check
-        run: make type
+      - name: Lint (ruff format/lint, pyright, pre-commit file checks)
+        run: make lint
 
   package_smoke:
     # Builds the package and installs the wheel on its own, the way a user gets it.

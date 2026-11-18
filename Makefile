@@ -48,7 +48,7 @@ install: ## Install full dependencies with uv sync (backward compatible - modern
 # CODE QUALITY
 # =============================================================================
 
-.PHONY: help setup-venv install-minimal install format type check clean test test-e2e benchmarks benchmarks-docker run-ci run-ci-fast run-ci-format-check run-ci-type run-ci-tests package-smoke build-docs serve-docs
+.PHONY: help setup-venv install-minimal install format type lint check clean test test-e2e benchmarks benchmarks-docker run-ci run-ci-fast run-ci-format-check run-ci-type run-ci-tests package-smoke build-docs serve-docs
 format: ## Format and lint all code
 	@echo "Formatting and linting all code..."
 	@echo "(ruff format) Formatting ragas..."
@@ -62,6 +62,17 @@ type: ## Type check all code
 	@echo "Type checking all code..."
 	@echo "(pyright) Typechecking ragas..."
 	$(Q)PYRIGHT_PYTHON_FORCE_VERSION=latest uv run --active pyright -p pyproject.toml src
+
+lint: ## Run every static check: ruff format/lint, pyright, and pre-commit file checks (what CI runs)
+	@echo "Running all lint checks..."
+	@echo "(ruff) Format check..."
+	$(Q)uv run --active ruff format --check $(RAGAS_PATHS) --exclude src/ragas/_version.py --config pyproject.toml
+	@echo "(ruff) Lint check..."
+	$(Q)uv run --active ruff check $(RAGAS_PATHS) --exclude src/ragas/_version.py --config pyproject.toml
+	$(Q)$(MAKE) type
+	@echo "(pre-commit) File checks..."
+	$(Q)SKIP=monorepo-ci uv run --active pre-commit run --all-files
+	@echo "All lint checks passed!"
 
 check: format type ## Quick health check (format + type, no tests)
 	@echo "Code quality check complete!"
@@ -92,11 +103,7 @@ benchmarks-test: ## Run benchmarks for ragas unit tests
 
 run-ci: ## Run complete CI pipeline (mirrors GitHub CI exactly)
 	@echo "Running complete CI pipeline..."
-	@echo "Format check..."
-	$(Q)uv run --active ruff format --check src tests docs --exclude src/ragas/_version.py --config pyproject.toml
-	$(Q)uv run --active ruff check src tests docs --exclude src/ragas/_version.py --config pyproject.toml
-	@echo "Type check..."
-	$(Q)$(MAKE) type
+	$(Q)$(MAKE) lint
 	@echo "Unit tests..."
 	$(Q)__RAGAS_DEBUG_TRACKING=true RAGAS_DO_NOT_TRACK=true uv run --active pytest --nbmake tests/unit --dist loadfile -n auto
 	@echo "All CI checks passed!"
