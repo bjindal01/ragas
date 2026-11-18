@@ -7,6 +7,10 @@ repos:
     hooks:
       - id: check-added-large-files
         args: [--maxkb=1024]
+        # uv.lock is a generated, committed lockfile (~3.7 MB). It shows up as an
+        # added file whenever main is merged into an older branch, which would
+        # block that merge commit.
+        exclude: ^uv\.lock$
       - id: check-merge-conflict
       - id: check-case-conflict
       - id: check-json
